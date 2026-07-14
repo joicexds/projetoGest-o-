@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Página Inicial{% endblock %}
+
+{% block extra_css %}
+<style>
+    .simple-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: var(--bg-color);
+    }
+    .simple-container h1 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="simple-container">
+    <h1>Bem-vindo ao Sistema de Controle do Senhor Osni!</h1>
+</div>
+{% endblock %}
