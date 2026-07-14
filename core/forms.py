@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Funcionario, Gasto, CategoriaGasto, Empresa, Adiantamento, RegistroTrabalho, Receita
 
 class CadastroForm(UserCreationForm):
     nome = forms.CharField(max_length=150, required=True, label="Nome completo")
@@ -25,3 +26,56 @@ class CadastroForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class FuncionarioForm(forms.ModelForm):
+    class Meta:
+        model = Funcionario
+        fields = ['nome', 'cpf', 'cargo', 'tipo_pagamento', 'salario', 'valor_diaria', 'telefone', 'data_admissao', 'ativo']
+        widgets = {
+            'data_admissao': forms.DateInput(attrs={'type': 'date'})
+        }
+
+class RegistroTrabalhoForm(forms.ModelForm):
+    class Meta:
+        model = RegistroTrabalho
+        fields = ['data', 'tipo', 'valor_diaria_aplicada', 'observacao']
+        widgets = {
+            'data': forms.DateInput(attrs={'type': 'date'}),
+            'observacao': forms.Textarea(attrs={'rows': 2}),
+        }
+
+class GastoForm(forms.ModelForm):
+    class Meta:
+        model = Gasto
+        fields = ['descricao', 'valor', 'data_gasto', 'categoria', 'funcionario_vinculado', 'observacoes']
+        widgets = {
+            'data_gasto': forms.DateInput(attrs={'type': 'date'}),
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class EmpresaForm(forms.ModelForm):
+    class Meta:
+        model = Empresa
+        fields = ['razao_social', 'cnpj', 'telefone', 'endereco']
+        widgets = {
+            'endereco': forms.Textarea(attrs={'rows': 2}),
+        }
+
+class AdiantamentoForm(forms.ModelForm):
+    class Meta:
+        model = Adiantamento
+        fields = ['funcionario', 'valor', 'data', 'status', 'observacao']
+        widgets = {
+            'data': forms.DateInput(attrs={'type': 'date'}),
+            'observacao': forms.Textarea(attrs={'rows': 2}),
+        }
+
+class ReceitaForm(forms.ModelForm):
+    class Meta:
+        model = Receita
+        fields = ['descricao', 'valor', 'data_recebimento', 'empresa_cliente', 'observacoes']
+        widgets = {
+            'data_recebimento': forms.DateInput(attrs={'type': 'date'}),
+            'observacoes': forms.Textarea(attrs={'rows': 2}),
+        }

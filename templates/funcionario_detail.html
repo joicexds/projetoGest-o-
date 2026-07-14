@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de {{ funcionario.nome }} - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Perfil do Funcionário</h1>
+            <div class="user-info" style="display: flex; gap: 1rem;">
+                <a href="{% url 'funcionario_holerite' funcionario.id %}" target="_blank" class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem; background-color: #ffffff; color: #121212;">🖨️ Imprimir Extrato</a>
+                <a href="{% url 'funcionario_list' %}" class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem; background-color: var(--secondary-color); color: var(--text-color);">Voltar à Lista</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- DADOS BÁSICOS -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 0.5rem;">{{ funcionario.nome }}</h2>
+                        <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                            {{ funcionario.cargo }} | CPF: {{ funcionario.cpf }} | {{ funcionario.get_tipo_pagamento_display }}
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'funcionario_update' funcionario.id %}" class="btn" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color);">Editar Dados</a>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Salário Base / Mensal</div>
+                        <div style="font-size: 1.2rem; font-weight: 700;">R$ {{ funcionario.salario|floatformat:2 }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Valor da Diária</div>
+                        <div style="font-size: 1.2rem; font-weight: 700;">R$ {{ funcionario.valor_diaria|default:"0,00"|floatformat:2 }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Próximo Pagamento</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">{{ funcionario.proximo_pagamento|date:"d/m/Y" }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status</div>
+                        {% if funcionario.ativo %}
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">Ativo</div>
+                        {% else %}
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--error-color);">Inativo</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMO E TOTALIZADORES -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="card" style="padding: 1.5rem;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Dias Trabalhados (Registrados)</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #ffffff;">{{ dias_trabalhados }}</div>
+                    <div style="font-size: 0.8rem; color: var(--primary-color);">Total em diárias: R$ {{ total_diarias|floatformat:2 }}</div>
+                </div>
+                <div class="card" style="padding: 1.5rem;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Atestados / Faltas</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #ffffff;">{{ dias_atestado }} / {{ dias_falta }}</div>
+                </div>
+                <div class="card" style="padding: 1.5rem; border-color: rgba(255,171,0,0.5);">
+                    <div style="font-size: 0.75rem; color: #ffab00; text-transform: uppercase;">Adiantamentos Pendentes (Descontar)</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #ffab00;">R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
+                </div>
+            </div>
+
+            <!-- SALÁRIO LÍQUIDO DESTAQUE -->
+            <div class="card" style="margin-bottom: 2rem; background-color: rgba(212, 244, 52, 0.1); border-color: var(--primary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">Líquido a Receber (Cálculo Automático)</div>
+                        <div style="font-size: 3rem; font-weight: 800; color: #ffffff;">R$ {{ salario_liquido|floatformat:2 }}</div>
+                    </div>
+                    <div style="text-align: right; color: var(--text-muted); font-size: 0.8rem;">
+                        <div>Ganhos: R$ {{ total_ganhos|floatformat:2 }}</div>
+                        <div style="color: #ffab00;">Descontos: - R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID PARA FORMULÁRIO E TABELA -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+                
+                <!-- NOVO REGISTRO DE TRABALHO -->
+                <div class="card" style="align-self: start;">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem;">Lançar Dia / Atestado</h3>
+                    <form method="post" action="{% url 'funcionario_detail' funcionario.id %}">
+                        {% csrf_token %}
+                        {% for field in form_registro %}
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem; background-color: var(--primary-color); color: var(--bg-color);">Adicionar Registro</button>
+                    </form>
+                </div>
+
+                <!-- HISTÓRICO DE TRABALHO -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <h3 style="font-size: 1.1rem; margin: 0;">Histórico de Ponto</h3>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background-color: rgba(255,255,255,0.05);">
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Data</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Tipo</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Valor da Diária</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Observação</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in registros %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem; font-weight: 600;">{{ reg.data|date:"d/m/Y" }}</td>
+                                <td style="padding: 1rem;">
+                                    {% if reg.tipo == 'PRESENCA' %}<span style="color: var(--primary-color);">Presença</span>
+                                    {% elif reg.tipo == 'FALTA' %}<span style="color: var(--error-color);">Falta</span>
+                                    {% elif reg.tipo == 'ATESTADO' %}<span style="color: #ffab00;">Atestado</span>
+                                    {% else %}Folga{% endif %}
+                                </td>
+                                <td style="padding: 1rem;">R$ {{ reg.valor_diaria_aplicada|floatformat:2 }}</td>
+                                <td style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">{{ reg.observacao|default:"-" }}</td>
+                                <td style="padding: 1rem;">
+                                    <form method="post" action="{% url 'registro_trabalho_delete' reg.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum registro encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<style>
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 0.6rem;
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.25rem;
+        color: var(--text-color);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}

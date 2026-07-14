@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holerite - {{ funcionario.nome }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.4;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .header p {
+            margin: 0.2rem 0 0 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .info-section div {
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .totals {
+            margin-top: 1.5rem;
+            border-top: 2px solid #000;
+            padding-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: 1.1rem;
+        }
+        .totals .line {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+            margin-bottom: 0.5rem;
+        }
+        .totals .net {
+            font-weight: bold;
+            font-size: 1.3rem;
+            border-top: 1px dashed #000;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .signature {
+            margin-top: 5rem;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            width: 300px;
+            margin: 0 auto;
+            padding-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 2rem auto;
+            padding: 0.75rem;
+            text-align: center;
+            background-color: #121212;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 0; }
+            .container { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir Holerite</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>FLORASYLVER</h1>
+            <p>Recibo de Pagamento - Controle Interno</p>
+        </div>
+
+        <div class="info-section">
+            <div>
+                <strong>Funcionário:</strong> {{ funcionario.nome }}<br>
+                <strong>CPF:</strong> {{ funcionario.cpf }}<br>
+                <strong>Cargo:</strong> {{ funcionario.cargo }}
+            </div>
+            <div style="text-align: right;">
+                <strong>Data de Emissão:</strong> {% now "d/m/Y" %}<br>
+                <strong>Tipo de Contrato:</strong> {{ funcionario.get_tipo_pagamento_display }}<br>
+            </div>
+        </div>
+
+        <h3>1. Ganhos Mensais / Diárias</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th style="width: 150px; text-align: right;">Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if funcionario.tipo_pagamento == 'DIARISTA' %}
+                    {% for reg in registros %}
+                        {% if reg.tipo == 'PRESENCA' %}
+                        <tr>
+                            <td>Diária Trabalhada - {{ reg.data|date:"d/m/Y" }}</td>
+                            <td style="text-align: right;">{{ reg.valor_diaria_aplicada|floatformat:2 }}</td>
+                        </tr>
+                        {% endif %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: #555;">Nenhuma diária registrada no período.</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td>Salário Mensal Base</td>
+                        <td style="text-align: right;">{{ funcionario.salario|floatformat:2 }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <h3>2. Descontos / Adiantamentos (Vales)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição do Vale</th>
+                    <th style="width: 150px; text-align: right;">Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ad in adiantamentos %}
+                <tr>
+                    <td>{{ ad.data|date:"d/m/Y" }}</td>
+                    <td>{{ ad.observacao|default:"Adiantamento / Vale" }}</td>
+                    <td style="text-align: right;">{{ ad.valor|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #555;">Nenhum vale pendente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="line">
+                <span>Total de Ganhos:</span>
+                <span>R$ {{ total_ganhos|floatformat:2 }}</span>
+            </div>
+            <div class="line" style="color: #d32f2f;">
+                <span>Total de Descontos:</span>
+                <span>- R$ {{ total_adiantado_pendente|floatformat:2 }}</span>
+            </div>
+            <div class="line net">
+                <span>LÍQUIDO A RECEBER:</span>
+                <span>R$ {{ salario_liquido|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <div class="signature">
+            <div class="signature-line">
+                <strong>{{ funcionario.nome }}</strong><br>
+                Assinatura do Recebedor
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    background-color: var(--bg-color);
 }
 
 .auth-card {
@@ -13,7 +13,8 @@
     max-width: 400px;
     padding: 2.5rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-color);
 }
 
 .auth-header {
@@ -60,8 +61,8 @@
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.1);
+    background-color: var(--card-bg);
 }
 
 .auth-footer {
@@ -82,7 +83,7 @@ ul.errorlist {
     font-size: 0.875rem;
     margin-bottom: 1rem;
     padding: 0.5rem;
-    background-color: #fef2f2;
+    background-color: #3b1717; /* Fundo de erro mais condizente com tema escuro */
     border-radius: 0.25rem;
 }
 

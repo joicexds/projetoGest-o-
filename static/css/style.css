@@ -1,13 +1,15 @@
 :root {
-    --bg-color: #f4f7fb;
-    --text-color: #1f2937;
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --input-bg: #f9fafb;
-    --text-muted: #6b7280;
-    --error-color: #ef4444;
+    --bg-color: #121212;          /* Preto fosco e profundo (Fundo Principal) */
+    --card-bg: #1a1a1a;           /* Fundo dos cards (Levemente mais claro que o fundo) */
+    --text-color: #ffffff;        /* Branco puro para textos principais */
+    --primary-color: #d4f434;     /* Amarelo/Verde neon da imagem */
+    --primary-hover: #e5f96b;     /* Hover um pouco mais claro */
+    --secondary-color: #2a2a2a;   /* Cinza utilitário */
+    --border-color: rgba(255, 255, 255, 0.08); /* Bordas ultra sutis cinzas */
+    --input-bg: #111111;          /* Fundo dos inputs preto absoluto */
+    --text-muted: #888888;        /* Cinza claro para textos secundários */
+    --error-color: #ff5555;       /* Vermelho alerta */
+    --sidebar-width: 250px;
 }
 
 * {
@@ -22,6 +24,7 @@ body {
     color: var(--text-color);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 a {
@@ -37,10 +40,10 @@ a:hover {
 .btn {
     display: inline-block;
     background-color: var(--primary-color);
-    color: white;
+    color: #171d18; /* Texto escuro no botão neon */
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
     text-align: center;
     border: none;
     cursor: pointer;
@@ -50,9 +53,227 @@ a:hover {
 
 .btn:hover {
     background-color: var(--primary-hover);
-    color: white;
+    color: #171d18;
 }
 
-.btn:active {
-    transform: scale(0.98);
+/* Layout do Dashboard */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (Menu Lateral) */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.sidebar-header p {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+}
+
+.sidebar-nav {
+    padding: 1.5rem 0;
+    flex-grow: 1;
+}
+
+.nav-link {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-footer .nav-link {
+    padding: 0.5rem 0;
+    color: #fca5a5; /* Vermelho claro para sair */
+}
+
+.sidebar-footer .nav-link:hover {
+    color: white;
+    background-color: transparent;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color);
+}
+
+.topbar {
+    background-color: transparent;
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.user-info {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.content-area {
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+/* Dashboard Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    padding: 1.75rem;
+    border-radius: 0.5rem; /* Bordas mais quadradas como na foto */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 244, 52, 0.3); /* Brilho amarelo/verde no hover */
+}
+
+.card h3 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.card .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+/* Novo layout para métricas extras dentro do card */
+.card .extra-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.card .extra-info span {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* Responsividade (Mobile) */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1rem;
+    }
+    
+    .sidebar-header {
+        padding: 1rem 0;
+        border-bottom: none;
+        text-align: left;
+    }
+    
+    .sidebar-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .sidebar-header p {
+        display: none; /* Oculta o slogan na barra superior mobile para ganhar espaço */
+    }
+    
+    .sidebar-nav {
+        display: flex;
+        padding: 0;
+    }
+    
+    .nav-link {
+        padding: 1rem 0.75rem;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        font-size: 0.85rem;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+        border-left-color: transparent;
+        border-bottom-color: white;
+    }
+    
+    .sidebar-footer {
+        padding: 0;
+        border-top: none;
+    }
+    
+    .sidebar-footer .nav-link {
+        padding: 1rem 0.5rem;
+    }
+
+    .topbar {
+        padding: 1rem;
+    }
+
+    .topbar h1 {
+        font-size: 1.25rem;
+    }
+
+    .content-area {
+        padding: 1rem;
+    }
 }

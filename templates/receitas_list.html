@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Receitas - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Gestão de Receitas</h1>
+            <div class="user-info">Olá, {{ user.first_name|default:user.username }}</div>
+        </header>
+
+        <section class="content-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-color);">Entradas e Faturamentos</h2>
+                <a href="{% url 'receita_create' %}" class="btn" style="width: auto; background-color: var(--primary-color); color: var(--bg-color);">+ Nova Receita</a>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Data</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Descrição</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Cliente (Empresa)</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Valor</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in receitas %}
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                            <td style="padding: 1rem 1.5rem;">{{ rec.data_recebimento|date:"d/m/Y" }}</td>
+                            <td style="padding: 1rem 1.5rem; font-weight: 600;">{{ rec.descricao }}</td>
+                            <td style="padding: 1rem 1.5rem; color: var(--text-muted);">{{ rec.empresa_cliente.razao_social|default:"-" }}</td>
+                            <td style="padding: 1rem 1.5rem; color: var(--primary-color); font-weight: 700;">+ R$ {{ rec.valor|floatformat:2 }}</td>
+                            <td style="padding: 1rem 1.5rem;">
+                                <a href="{% url 'receita_update' rec.id %}" style="color: var(--primary-color); margin-right: 1rem; font-size: 0.85rem;">Editar</a>
+                                <form method="post" action="{% url 'receita_delete' rec.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.85rem;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                Nenhuma receita cadastrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
