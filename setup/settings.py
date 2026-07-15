@@ -26,8 +26,14 @@ SECRET_KEY = 'django-insecure-%f7500(2h*ieztau#mviiv0bhp*ov)*-yr7765h5(lm#0qzu12
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+# Permitir formulários POST de túneis externos (ngrok, serveo, pinggy, etc)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.serveousercontent.com',
+    'https://*.pinggy.io',
+    'https://*.localhost.run',
+]
 
 # Application definition
 
@@ -125,7 +131,12 @@ STATICFILES_DIRS = [
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Exigir login sempre que o navegador for fechado
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Deslogar automaticamente após 15 minutos de inatividade (900 segundos)
+SESSION_COOKIE_AGE = 900
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -14,56 +14,11 @@
 
         <section class="content-area">
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                
-                <div class="card" style="border-color: {% if lucro %}var(--primary-color){% else %}var(--error-color){% endif %}; background-color: rgba({% if lucro %}212, 244, 52{% else %}255, 107, 107{% endif %}, 0.1);">
-                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-transform: uppercase;">Margem / Balanço (Mês Atual)</h3>
-                    <div style="font-size: 2.5rem; font-weight: 700; color: {% if lucro %}var(--primary-color){% else %}var(--error-color){% endif %};">R$ {{ balanco|floatformat:2 }}</div>
-                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">{% if lucro %}Lucro no mês{% else %}Prejuízo no mês{% endif %}</div>
-                </div>
-
-                <div class="card">
-                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-transform: uppercase;">Receitas (Entradas)</h3>
-                    <div style="font-size: 2.5rem; font-weight: 700; color: #ffffff;">R$ {{ total_receitas|floatformat:2 }}</div>
-                </div>
-
-                <div class="card">
-                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-transform: uppercase;">Despesas (Saídas + Folha)</h3>
-                    <div style="font-size: 2.5rem; font-weight: 700; color: #ffffff;">R$ {{ total_gastos|floatformat:2 }}</div>
-                </div>
-                
-                <div class="card">
-                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-transform: uppercase;">Funcionários Ativos</h3>
-                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color);">{{ total_funcionarios }}</div>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                
-                <!-- ÚLTIMAS SAÍDAS -->
+            <!-- TABELAS (AGORA NO TOPO) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+                <!-- ÚLTIMAS ENTRADAS (Trocado de lugar, Entradas primeiro) -->
                 <div class="card" style="padding: 0; overflow: hidden;">
-                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="font-size: 1.1rem; margin: 0;">Últimas Saídas</h3>
-                        <a href="{% url 'gasto_list' %}" style="color: var(--primary-color); font-size: 0.8rem; text-decoration: none;">Ver todos</a>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                        {% for gasto in ultimos_gastos %}
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 1rem 1.5rem;">
-                                <div style="font-weight: 600;">{{ gasto.descricao }}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ gasto.data_gasto|date:"d/m/Y" }}</div>
-                            </td>
-                            <td style="padding: 1rem 1.5rem; color: var(--error-color); font-weight: 700; text-align: right;">- R$ {{ gasto.valor|floatformat:2 }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="2" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">Nenhum gasto recente.</td></tr>
-                        {% endfor %}
-                    </table>
-                </div>
-
-                <!-- ÚLTIMAS ENTRADAS -->
-                <div class="card" style="padding: 0; overflow: hidden;">
-                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                         <h3 style="font-size: 1.1rem; margin: 0;">Últimas Entradas</h3>
                         <a href="{% url 'receita_list' %}" style="color: var(--primary-color); font-size: 0.8rem; text-decoration: none;">Ver todas</a>
                     </div>
@@ -82,6 +37,51 @@
                     </table>
                 </div>
 
+                <!-- ÚLTIMAS SAÍDAS (Segundo) -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; margin: 0;">Últimas Saídas</h3>
+                        <a href="{% url 'gasto_list' %}" style="color: var(--primary-color); font-size: 0.8rem; text-decoration: none;">Ver todos</a>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        {% for gasto in ultimos_gastos %}
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 1rem 1.5rem;">
+                                <div style="font-weight: 600;">{{ gasto.descricao }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ gasto.data_gasto|date:"d/m/Y" }}</div>
+                            </td>
+                            <td style="padding: 1rem 1.5rem; color: var(--error-color); font-weight: 700; text-align: right;">- R$ {{ gasto.valor|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">Nenhum gasto recente.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- CARDS PEQUENOS (AGORA EMBAIXO E BEM MAIS COMPACTOS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                
+                <div class="card" style="padding: 1rem; border-color: {% if lucro %}var(--primary-color){% else %}var(--error-color){% endif %}; background-color: rgba({% if lucro %}212, 244, 52{% else %}255, 107, 107{% endif %}, 0.05);">
+                    <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Balanço Mensal</h3>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: {% if lucro %}var(--primary-color){% else %}var(--error-color){% endif %};">R$ {{ balanco|floatformat:2 }}</div>
+                    <div style="margin-top: 0.5rem; font-size: 0.65rem; color: var(--text-muted);">{% if lucro %}Lucro{% else %}Prejuízo{% endif %}</div>
+                </div>
+
+                <div class="card" style="padding: 1rem;">
+                    <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Entradas</h3>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff;">R$ {{ total_receitas|floatformat:2 }}</div>
+                </div>
+
+                <div class="card" style="padding: 1rem;">
+                    <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Saídas</h3>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff;">R$ {{ total_gastos|floatformat:2 }}</div>
+                </div>
+                
+                <div class="card" style="padding: 1rem;">
+                    <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Funcionários Ativos</h3>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">{{ total_funcionarios }}</div>
+                </div>
             </div>
 
         </section>

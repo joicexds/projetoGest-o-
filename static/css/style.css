@@ -1,15 +1,15 @@
 :root {
-    --bg-color: #121212;          /* Preto fosco e profundo (Fundo Principal) */
-    --card-bg: #1a1a1a;           /* Fundo dos cards (Levemente mais claro que o fundo) */
-    --text-color: #ffffff;        /* Branco puro para textos principais */
-    --primary-color: #d4f434;     /* Amarelo/Verde neon da imagem */
-    --primary-hover: #e5f96b;     /* Hover um pouco mais claro */
-    --secondary-color: #2a2a2a;   /* Cinza utilitário */
-    --border-color: rgba(255, 255, 255, 0.08); /* Bordas ultra sutis cinzas */
-    --input-bg: #111111;          /* Fundo dos inputs preto absoluto */
-    --text-muted: #888888;        /* Cinza claro para textos secundários */
-    --error-color: #ff5555;       /* Vermelho alerta */
-    --sidebar-width: 250px;
+    --bg-color: #0d1117;          /* Preto elegante/comercial (Estilo SaaS Premium) */
+    --card-bg: #161b22;           /* Fundo dos cards refinado */
+    --text-color: #f0f6fc;        /* Branco suave para textos principais */
+    --primary-color: #d4f434;     /* Amarelo/Verde neon da identidade */
+    --primary-hover: #e5f96b;     /* Hover do botão principal */
+    --secondary-color: #21262d;   /* Cinza comercial para botões secundários */
+    --border-color: rgba(240, 246, 252, 0.08); /* Bordas ultra sutis premium */
+    --input-bg: #0d1117;          /* Fundo dos inputs contrastante */
+    --text-muted: #8b949e;        /* Cinza sofisticado para textos secundários */
+    --error-color: #f85149;       /* Vermelho suave para alertas */
+    --sidebar-width: 260px;
 }
 
 * {
@@ -19,12 +19,17 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    line-height: 1.5;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
 }
 
 a {
@@ -40,14 +45,15 @@ a:hover {
 .btn {
     display: inline-block;
     background-color: var(--primary-color);
-    color: #171d18; /* Texto escuro no botão neon */
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
+    color: #000000; /* Texto bem escuro para alto contraste */
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.375rem; /* Borda mais comercial */
     font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     text-align: center;
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
 }
 
@@ -161,18 +167,18 @@ a:hover {
 /* Dashboard Cards */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Reduzido para permitir cards menores */
+    gap: 1.25rem;
     margin-bottom: 2rem;
 }
 
 .card {
     background-color: var(--card-bg);
-    padding: 1.75rem;
-    border-radius: 0.5rem; /* Bordas mais quadradas como na foto */
+    padding: 1.25rem; /* Padding reduzido para card menor */
+    border-radius: 0.5rem; /* Bordas um pouco menos arredondadas proporcionalmente */
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Sombra mais contida */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
@@ -181,16 +187,16 @@ a:hover {
 }
 
 .card h3 {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 0.5px;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .card .value {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--text-color);
 }

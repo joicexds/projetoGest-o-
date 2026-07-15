@@ -17,6 +17,12 @@ class CadastroForm(UserCreationForm):
         if 'username' in self.fields:
             del self.fields['username']
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este e-mail já está cadastrado no sistema. Tente fazer login ou use outro e-mail.")
+        return email
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['nome']
@@ -54,6 +60,13 @@ class GastoForm(forms.ModelForm):
             'observacoes': forms.Textarea(attrs={'rows': 3}),
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['categoria'].queryset = CategoriaGasto.objects.filter(usuario=user)
+            self.fields['funcionario_vinculado'].queryset = Funcionario.objects.filter(usuario=user)
+
 class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
@@ -71,6 +84,12 @@ class AdiantamentoForm(forms.ModelForm):
             'observacao': forms.Textarea(attrs={'rows': 2}),
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['funcionario'].queryset = Funcionario.objects.filter(usuario=user)
+
 class ReceitaForm(forms.ModelForm):
     class Meta:
         model = Receita
@@ -79,3 +98,9 @@ class ReceitaForm(forms.ModelForm):
             'data_recebimento': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 2}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['empresa_cliente'].queryset = Empresa.objects.filter(usuario=user)

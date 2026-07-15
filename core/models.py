@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django_cryptography.fields import encrypt
 
 class Funcionario(models.Model):
     TIPO_PAGAMENTO_CHOICES = (
@@ -6,15 +8,19 @@ class Funcionario(models.Model):
         ('DIARISTA', 'Diarista'),
     )
     nome = models.CharField(max_length=200, verbose_name="Nome Completo")
-    cpf = models.CharField(max_length=14, unique=True, verbose_name="CPF")
+    cpf = encrypt(models.CharField(max_length=14, verbose_name="CPF"))
     cargo = models.CharField(max_length=100, verbose_name="Cargo")
     tipo_pagamento = models.CharField(max_length=20, choices=TIPO_PAGAMENTO_CHOICES, default='MENSALISTA', verbose_name="Tipo de Pagamento")
     salario = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Salário Base / Mensal", default=0.00)
     valor_diaria = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor da Diária", default=0.00, blank=True, null=True)
-    telefone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone")
+    telefone = encrypt(models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone"))
     data_admissao = models.DateField(verbose_name="Data de Admissão")
     ativo = models.BooleanField(default=True, verbose_name="Está Ativo?")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1, verbose_name="Usuário Proprietário")
     data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['usuario', 'cpf']
 
     def __str__(self):
         return f"{self.nome} - {self.cargo}"
@@ -54,6 +60,7 @@ class RegistroTrabalho(models.Model):
     tipo = models.CharField(max_length=15, choices=TIPO_REGISTRO_CHOICES, default='PRESENCA', verbose_name="Tipo do Registro")
     valor_diaria_aplicada = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="Diária Aplicada (R$)")
     observacao = models.TextField(blank=True, null=True, verbose_name="Observação / Detalhe do Atestado")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -61,8 +68,12 @@ class RegistroTrabalho(models.Model):
 
 
 class CategoriaGasto(models.Model):
-    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome da Categoria")
+    nome = models.CharField(max_length=100, verbose_name="Nome da Categoria")
     descricao = models.TextField(blank=True, null=True, verbose_name="Descrição (Opcional)")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+    class Meta:
+        unique_together = ['usuario', 'nome']
 
     def __str__(self):
         return self.nome
@@ -83,6 +94,7 @@ class Gasto(models.Model):
         help_text="Preencha apenas se for um gasto direcionado a um funcionário específico (ex: EPI, Adiantamento)."
     )
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -91,10 +103,14 @@ class Gasto(models.Model):
 
 class Empresa(models.Model):
     razao_social = models.CharField(max_length=200, verbose_name="Razão Social / Nome Fantasia")
-    cnpj = models.CharField(max_length=18, unique=True, blank=True, null=True, verbose_name="CNPJ")
-    telefone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone")
+    cnpj = encrypt(models.CharField(max_length=18, blank=True, null=True, verbose_name="CNPJ"))
+    telefone = encrypt(models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone"))
     endereco = models.TextField(blank=True, null=True, verbose_name="Endereço Completo")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['usuario', 'cnpj']
 
     def __str__(self):
         return self.razao_social
@@ -111,6 +127,7 @@ class Adiantamento(models.Model):
     data = models.DateField(verbose_name="Data do Adiantamento")
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PENDENTE', verbose_name="Status")
     observacao = models.TextField(blank=True, null=True, verbose_name="Observação")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -122,6 +139,7 @@ class Receita(models.Model):
     data_recebimento = models.DateField(verbose_name="Data do Recebimento")
     empresa_cliente = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True, related_name="receitas", verbose_name="Cliente / Parceiro")
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

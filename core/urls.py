@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     # A rota vazia '' agora é o login
-    path('', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login_home'),
+    path('', auth_views.LoginView.as_view(), name='login_home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('cadastro/', views.cadastro, name='cadastro'),
 
