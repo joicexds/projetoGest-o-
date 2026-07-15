@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Cadastrar Conta" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header" style="text-align: center;">
+            <svg width="60" height="60" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 35 98 A 50 50 0 1 1 20 85" stroke="#365e3d" stroke-width="4" stroke-linecap="round"/>
+              <path d="M 35 98 C 60 115, 60 80, 60 55" stroke="#133d59" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 58 65 C 30 65, 30 35, 30 35 C 45 35, 58 50, 58 65 Z" fill="#84c540"/>
+              <path d="M 60 55 C 45 35, 60 20, 60 20 C 60 20, 75 35, 60 55 Z" fill="#59a835"/>
+              <path d="M 62 65 C 90 65, 90 35, 90 35 C 75 35, 62 50, 62 65 Z" fill="#133d59"/>
+            </svg>
+            <h1 style="color: #ffffff; font-size: 1.8rem; letter-spacing: 2px; margin-top: 1rem; font-weight: 700;">FLORASYLVER</h1>
+        </div>
+
+        <div style="text-align: center; color: #a3a3a3; margin-bottom: 2rem;">
+            <p style="font-size: 1.1rem; color: #ffffff; margin-bottom: 0.5rem;">Falta pouco!</p>
+            <p>Você está prestes a conectar sua conta do <strong>{{ account.get_provider.name }}</strong>.</p>
+        </div>
+
+        <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="errorlist" style="margin-bottom: 1rem; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+                    Por favor, verifique as informações abaixo.
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                    <label for="{{ field.id_for_label }}" style="color: #a3a3a3; font-size: 0.9rem;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span style="color: #ff6b6b; font-size: 0.8rem; margin-top: 5px; display: block;">{{ field.errors|striptags }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn" style="margin-top: 1rem;">Concluir Cadastro</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Adiciona classe form-control a todos os inputs para estilização
+    document.querySelectorAll('input').forEach(input => {
+        if (input.type !== 'hidden' && input.type !== 'submit') {
+            input.classList.add('form-control');
+        }
+    });
+</script>
+{% endblock %}
