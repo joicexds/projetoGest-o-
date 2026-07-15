@@ -9,9 +9,7 @@ def cadastro(request):
     if request.method == 'POST':
         form = CadastroForm(request.POST)
         if form.is_valid():
-            user = obj = form.save(commit=False)
-            obj.usuario = request.user
-            obj.save()
+            user = form.save()
             # Fazer o login automático do usuário recém-cadastrado
             login(request, user)
             return redirect('dashboard')
