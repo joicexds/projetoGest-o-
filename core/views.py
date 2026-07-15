@@ -11,7 +11,7 @@ def cadastro(request):
         if form.is_valid():
             user = form.save()
             # Fazer o login automático do usuário recém-cadastrado
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('dashboard')
     else:
         form = CadastroForm()
