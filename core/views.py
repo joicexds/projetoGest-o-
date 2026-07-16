@@ -1,9 +1,35 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import CadastroForm, FuncionarioForm, GastoForm, EmpresaForm, AdiantamentoForm, RegistroTrabalhoForm, ReceitaForm
-from .models import Funcionario, Gasto, CategoriaGasto, Empresa, Adiantamento, RegistroTrabalho, Receita
+from .forms import CadastroForm, FuncionarioForm, GastoForm, AdiantamentoForm, RegistroTrabalhoForm, ReceitaForm, UsuarioUpdateForm, UserProfileForm
+from .models import Funcionario, Gasto, CategoriaGasto, Adiantamento, RegistroTrabalho, Receita, UserProfile
 from django.db.models import Sum
 from django.contrib.auth import login
+from django.contrib import messages
+
+# ==========================================
+# PERFIL DO USUÁRIO
+# ==========================================
+
+@login_required
+def perfil_usuario(request):
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=request.user)
+
+    if request.method == 'POST':
+        form = UsuarioUpdateForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid() and profile_form.is_valid():
+            form.save()
+            profile_form.save()
+            messages.success(request, 'Seu perfil foi atualizado com sucesso!')
+            return redirect('perfil')
+    else:
+        form = UsuarioUpdateForm(instance=request.user)
+        profile_form = UserProfileForm(instance=profile)
+    
+    return render(request, 'perfil.html', {'form': form, 'profile_form': profile_form})
 
 def cadastro(request):
     if request.method == 'POST':
@@ -20,9 +46,21 @@ def cadastro(request):
 
 @login_required
 def dashboard(request):
-    from datetime import date
-    mes_atual = date.today().month
-    ano_atual = date.today().year
+    from datetime import datetime, date
+    mes_ano = request.GET.get('mes_ano')
+    if mes_ano:
+        try:
+            dt = datetime.strptime(mes_ano, '%Y-%m')
+            mes_atual = dt.month
+            ano_atual = dt.year
+        except ValueError:
+            mes_atual = date.today().month
+            ano_atual = date.today().year
+    else:
+        mes_atual = date.today().month
+        ano_atual = date.today().year
+    
+    mes_ano_str = f"{ano_atual}-{mes_atual:02d}"
 
     # Receitas
     total_receitas = Receita.objects.filter(usuario=request.user, data_recebimento__month=mes_atual, data_recebimento__year=ano_atual).aggregate(total=Sum('valor'))['total'] or 0.00
@@ -52,6 +90,8 @@ def dashboard(request):
         'ultimos_gastos': ultimos_gastos,
         'ultimas_receitas': ultimas_receitas,
         'mes_atual': mes_atual,
+        'ano_atual': ano_atual,
+        'mes_ano_str': mes_ano_str,
     }
     return render(request, 'dashboard.html', context)
 
@@ -62,8 +102,12 @@ def dashboard(request):
 
 @login_required
 def funcionario_list(request):
-    funcionarios = Funcionario.objects.filter(usuario=request.user).order_by('nome')
-    return render(request, 'funcionarios_list.html', {'funcionarios': funcionarios})
+    q = request.GET.get('q', '')
+    funcionarios = Funcionario.objects.filter(usuario=request.user)
+    if q:
+        funcionarios = funcionarios.filter(nome__icontains=q)
+    funcionarios = funcionarios.order_by('nome')
+    return render(request, 'funcionarios_list.html', {'funcionarios': funcionarios, 'q': q})
 
 @login_required
 def funcionario_form(request, id=None):
@@ -226,37 +270,6 @@ def gasto_delete(request, id):
     return render(request, 'gasto_confirm_delete.html', {'gasto': gasto})
 
 # ==========================================
-# EMPRESAS
-# ==========================================
-
-@login_required
-def empresa_list(request):
-    empresas = Empresa.objects.filter(usuario=request.user).order_by('razao_social')
-    return render(request, 'empresas_list.html', {'empresas': empresas})
-
-@login_required
-def empresa_form(request, id=None):
-    empresa = get_object_or_404(Empresa, id=id, usuario=request.user) if id else None
-    if request.method == 'POST':
-        form = EmpresaForm(request.POST, instance=empresa)
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.usuario = request.user
-            obj.save()
-            return redirect('empresa_list')
-    else:
-        form = EmpresaForm(instance=empresa)
-    return render(request, 'empresa_form.html', {'form': form, 'empresa': empresa})
-
-@login_required
-def empresa_delete(request, id):
-    empresa = get_object_or_404(Empresa, id=id, usuario=request.user)
-    if request.method == 'POST':
-        empresa.delete()
-        return redirect('empresa_list')
-    return render(request, 'empresa_confirm_delete.html', {'empresa': empresa})
-
-# ==========================================
 # ADIANTAMENTOS
 # ==========================================
 
@@ -327,15 +340,27 @@ def receita_delete(request, id):
 
 @login_required
 def relatorios(request):
-    from datetime import date
-    mes_atual = date.today().month
-    ano_atual = date.today().year
+    from datetime import datetime, date
+    mes_ano = request.GET.get('mes_ano')
+    if mes_ano:
+        try:
+            dt = datetime.strptime(mes_ano, '%Y-%m')
+            mes_atual = dt.month
+            ano_atual = dt.year
+        except ValueError:
+            mes_atual = date.today().month
+            ano_atual = date.today().year
+    else:
+        mes_atual = date.today().month
+        ano_atual = date.today().year
+    
+    mes_ano_str = f"{ano_atual}-{mes_atual:02d}"
 
-    total_gastos = Gasto.objects.aggregate(total=Sum('valor'))['total'] or 0.00
-    total_adiantamentos = Adiantamento.objects.filter(usuario=request.user, status='PENDENTE').aggregate(total=Sum('valor'))['total'] or 0.00
+    total_gastos = Gasto.objects.filter(usuario=request.user, data_gasto__month=mes_atual, data_gasto__year=ano_atual).aggregate(total=Sum('valor'))['total'] or 0.00
+    total_adiantamentos = Adiantamento.objects.filter(usuario=request.user, status='PENDENTE', data__month=mes_atual, data__year=ano_atual).aggregate(total=Sum('valor'))['total'] or 0.00
     total_salarios = Funcionario.objects.filter(usuario=request.user, ativo=True).aggregate(total=Sum('salario'))['total'] or 0.00
     
-    gastos_por_categoria = Gasto.objects.values('categoria__nome').annotate(total=Sum('valor')).order_by('-total')
+    gastos_por_categoria = Gasto.objects.filter(usuario=request.user, data_gasto__month=mes_atual, data_gasto__year=ano_atual).values('categoria__nome').annotate(total=Sum('valor')).order_by('-total')
 
     funcionarios = Funcionario.objects.filter(usuario=request.user, ativo=True)
     dados_funcionarios = []
@@ -378,5 +403,6 @@ def relatorios(request):
         'dados_funcionarios': dados_funcionarios,
         'mes_atual': mes_atual,
         'ano_atual': ano_atual,
+        'mes_ano_str': mes_ano_str,
     }
     return render(request, 'relatorios.html', context)

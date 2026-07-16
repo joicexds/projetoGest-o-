@@ -8,6 +8,7 @@ urlpatterns = [
     path('', auth_views.LoginView.as_view(authentication_form=CustomLoginForm), name='login_home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('cadastro/', views.cadastro, name='cadastro'),
+    path('perfil/', views.perfil_usuario, name='perfil'),
 
     # Funcionários
     path('funcionarios/', views.funcionario_list, name='funcionario_list'),
@@ -24,11 +25,7 @@ urlpatterns = [
     path('gastos/editar/<int:id>/', views.gasto_form, name='gasto_update'),
     path('gastos/excluir/<int:id>/', views.gasto_delete, name='gasto_delete'),
 
-    # Empresas
-    path('empresas/', views.empresa_list, name='empresa_list'),
-    path('empresas/novo/', views.empresa_form, name='empresa_create'),
-    path('empresas/editar/<int:id>/', views.empresa_form, name='empresa_update'),
-    path('empresas/excluir/<int:id>/', views.empresa_delete, name='empresa_delete'),
+
 
     # Adiantamentos
     path('adiantamentos/', views.adiantamento_list, name='adiantamento_list'),

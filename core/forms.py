@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Funcionario, Gasto, CategoriaGasto, Empresa, Adiantamento, RegistroTrabalho, Receita
+from .models import Funcionario, Gasto, CategoriaGasto, Adiantamento, RegistroTrabalho, Receita, UserProfile
 
 class CadastroForm(UserCreationForm):
     nome = forms.CharField(max_length=150, required=True, label="Nome completo")
@@ -9,30 +9,48 @@ class CadastroForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("nome", "email")
+        fields = ("username", "nome", "email")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Removendo o username padrão para usar o e-mail no lugar
-        if 'username' in self.fields:
-            del self.fields['username']
+        self.fields['username'].label = "Nome de Usuário (para Login)"
+        self.fields['username'].help_text = "Letras, números e os símbolos @/./+/-/_ apenas."
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').lower()
-        if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Este e-mail já está cadastrado no sistema. Tente fazer login ou use outro e-mail.")
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este e-mail já está cadastrado no sistema.")
         return email
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['nome']
         user.email = self.cleaned_data['email']
-        # Usaremos o próprio e-mail como 'username' único do sistema
-        user.username = self.cleaned_data['email']
         if commit:
             user.save()
         return user
 
+class UsuarioUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=150, required=True, label="Nome completo")
+    email = forms.EmailField(max_length=254, required=True, label="E-mail")
+
+    class Meta:
+        model = User
+        fields = ("first_name", "email")
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').lower()
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Este e-mail já está cadastrado por outro usuário.")
+        return email
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('foto',)
+        labels = {
+            'foto': 'Foto de Perfil'
+        }
 
 class CustomLoginForm(AuthenticationForm):
     def clean_username(self):
@@ -74,14 +92,6 @@ class GastoForm(forms.ModelForm):
             self.fields['categoria'].queryset = CategoriaGasto.objects.filter(usuario=user)
             self.fields['funcionario_vinculado'].queryset = Funcionario.objects.filter(usuario=user)
 
-class EmpresaForm(forms.ModelForm):
-    class Meta:
-        model = Empresa
-        fields = ['razao_social', 'cnpj', 'telefone', 'endereco']
-        widgets = {
-            'endereco': forms.Textarea(attrs={'rows': 2}),
-        }
-
 class AdiantamentoForm(forms.ModelForm):
     class Meta:
         model = Adiantamento
@@ -100,7 +110,7 @@ class AdiantamentoForm(forms.ModelForm):
 class ReceitaForm(forms.ModelForm):
     class Meta:
         model = Receita
-        fields = ['descricao', 'valor', 'data_recebimento', 'empresa_cliente', 'observacoes']
+        fields = ['descricao', 'valor', 'data_recebimento', 'observacoes']
         widgets = {
             'data_recebimento': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 2}),
@@ -109,5 +119,3 @@ class ReceitaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        if user:
-            self.fields['empresa_cliente'].queryset = Empresa.objects.filter(usuario=user)

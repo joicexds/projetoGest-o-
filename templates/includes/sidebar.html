@@ -1,6 +1,6 @@
 <aside class="sidebar">
     <div class="sidebar-header">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #ffffff; letter-spacing: 2px;">FLORASYLVER</h2>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-color); letter-spacing: 2px;">FLORASYLVER</h2>
         <p style="color: var(--text-muted); font-size: 0.75rem;">Reflorestamento de Pinos</p>
     </div>
     
@@ -8,13 +8,42 @@
         <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Início (Dashboard)</a>
         <a href="{% url 'relatorios' %}" class="nav-link {% if 'relatorio' in request.resolver_match.url_name %}active{% endif %}">Relatórios Financeiros</a>
         <a href="{% url 'receita_list' %}" class="nav-link {% if 'receita' in request.resolver_match.url_name %}active{% endif %}">Receitas (Entradas)</a>
-        <a href="{% url 'empresa_list' %}" class="nav-link {% if 'empresa' in request.resolver_match.url_name %}active{% endif %}">Empresas Parceiras</a>
+
         <a href="{% url 'funcionario_list' %}" class="nav-link {% if 'funcionario' in request.resolver_match.url_name %}active{% endif %}">Funcionários</a>
         <a href="{% url 'adiantamento_list' %}" class="nav-link {% if 'adiantamento' in request.resolver_match.url_name %}active{% endif %}">Vales / Adiantamentos</a>
         <a href="{% url 'gasto_list' %}" class="nav-link {% if 'gasto' in request.resolver_match.url_name %}active{% endif %}">Gastos & Despesas</a>
+        <a href="{% url 'perfil' %}" class="nav-link {% if 'perfil' in request.resolver_match.url_name %}active{% endif %}" style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">Configurações (Perfil)</a>
     </nav>
     
     <div class="sidebar-footer">
-        <a href="{% url 'logout' %}" class="nav-link">Sair do Sistema</a>
+        <button id="theme-toggle" class="nav-link" style="width: 100%; text-align: center; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: center; align-items: center;">
+            <span id="theme-icon">🌙</span>
+        </button>
+        <a href="{% url 'logout' %}" class="nav-link" style="padding: 1rem 1.5rem; color: #fca5a5; text-align: center;">Sair do Sistema</a>
     </div>
 </aside>
+
+<script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function updateThemeUI() {
+        if (document.documentElement.getAttribute('data-theme') === 'light') {
+            themeIcon.textContent = '🌙';
+        } else {
+            themeIcon.textContent = '☀️';
+        }
+    }
+
+    // Initial load
+    updateThemeUI();
+
+    themeToggleBtn.addEventListener('click', () => {
+        let currentTheme = document.documentElement.getAttribute('data-theme');
+        let newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeUI();
+    });
+</script>

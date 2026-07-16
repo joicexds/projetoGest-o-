@@ -7,9 +7,21 @@
     {% include 'includes/sidebar.html' %}
 
     <main class="main-content">
-        <header class="topbar">
-            <h1>Visão Geral</h1>
-            <div class="user-info">Olá, {{ user.first_name|default:user.username }}</div>
+        <header class="topbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h1>Visão Geral</h1>
+                {% include 'includes/topbar_user.html' %}
+            </div>
+            
+            <form action="{% url 'funcionario_list' %}" method="get" style="display: flex; gap: 8px; flex-grow: 1; max-width: 400px; margin: 0 1rem;">
+                <input type="search" name="q" placeholder="Pesquisar funcionário..." style="flex-grow: 1; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
+                <button type="submit" class="btn" style="width: auto; padding: 0.5rem 1rem;">🔍</button>
+            </form>
+
+            <form method="get" class="month-filter-form" style="display: flex; align-items: center;">
+                <label for="mes_ano" style="margin-right: 8px; font-weight: 600;">Mês:</label>
+                <input type="month" name="mes_ano" id="mes_ano" value="{{ mes_ano_str }}" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+            </form>
         </header>
 
         <section class="content-area">

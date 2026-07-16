@@ -9,14 +9,18 @@
     <main class="main-content">
         <header class="topbar">
             <h1>Gestão de Funcionários</h1>
-            <div class="user-info">
-                Olá, {{ user.first_name|default:user.username }}
-            </div>
+            {% include 'includes/topbar_user.html' %}
         </header>
 
         <section class="content-area">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                 <h2 style="font-size: 1.5rem; color: var(--primary-color);">Equipe</h2>
+                
+                <form method="get" style="display: flex; flex-grow: 1; max-width: 400px; gap: 8px;">
+                    <input type="search" name="q" value="{{ q }}" placeholder="Buscar funcionário por nome..." style="flex-grow: 1; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
+                    <button type="submit" class="btn" style="width: auto; padding: 0.5rem 1rem;">Buscar</button>
+                </form>
+
                 <a href="{% url 'funcionario_create' %}" class="btn" style="width: auto;">+ Novo Funcionário</a>
             </div>
 

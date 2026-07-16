@@ -7,9 +7,15 @@
     {% include 'includes/sidebar.html' %}
 
     <main class="main-content">
-        <header class="topbar no-print">
-            <h1>Relatórios Financeiros</h1>
-            <div class="user-info">Olá, {{ user.first_name|default:user.username }}</div>
+        <header class="topbar no-print" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h1>Relatórios Financeiros</h1>
+                {% include 'includes/topbar_user.html' %}
+            </div>
+            <form method="get" class="month-filter-form" style="display: flex; align-items: center;">
+                <label for="mes_ano" style="margin-right: 8px; font-weight: 600;">Filtrar Mês:</label>
+                <input type="month" name="mes_ano" id="mes_ano" value="{{ mes_ano_str }}" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+            </form>
         </header>
 
         <section class="content-area">

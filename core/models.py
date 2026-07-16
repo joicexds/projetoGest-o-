@@ -101,20 +101,6 @@ class Gasto(models.Model):
         return f"{self.descricao} - R$ {self.valor}"
 
 
-class Empresa(models.Model):
-    razao_social = models.CharField(max_length=200, verbose_name="Razão Social / Nome Fantasia")
-    cnpj = encrypt(models.CharField(max_length=18, blank=True, null=True, verbose_name="CNPJ"))
-    telefone = encrypt(models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone"))
-    endereco = models.TextField(blank=True, null=True, verbose_name="Endereço Completo")
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    data_registro = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ['usuario', 'cnpj']
-
-    def __str__(self):
-        return self.razao_social
-
 
 class Adiantamento(models.Model):
     STATUS_CHOICES = (
@@ -137,10 +123,28 @@ class Receita(models.Model):
     descricao = models.CharField(max_length=255, verbose_name="Descrição da Receita")
     valor = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor Recebido (R$)")
     data_recebimento = models.DateField(verbose_name="Data do Recebimento")
-    empresa_cliente = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True, related_name="receitas", verbose_name="Cliente / Parceiro")
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.descricao} - R$ {self.valor}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    foto = models.ImageField(upload_to='perfil_fotos/', blank=True, null=True, verbose_name="Foto de Perfil")
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()

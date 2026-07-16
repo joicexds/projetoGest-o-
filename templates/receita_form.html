@@ -9,7 +9,7 @@
     <main class="main-content">
         <header class="topbar">
             <h1>{% if receita %}Editar Receita{% else %}Nova Receita{% endif %}</h1>
-            <div class="user-info">Olá, {{ user.first_name|default:user.username }}</div>
+            {% include 'includes/topbar_user.html' %}
         </header>
 
         <section class="content-area">
