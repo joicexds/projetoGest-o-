@@ -141,11 +141,14 @@ LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Exigir login sempre que o navegador for fechado
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Não exigir login quando o navegador for fechado (Permitir "Lembrar de Mim")
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# Deslogar automaticamente após 15 minutos de inatividade (900 segundos)
-SESSION_COOKIE_AGE = 900
+# Sessão válida por 2 semanas (padrão da web)
+SESSION_COOKIE_AGE = 1209600
+
+# Forçar o AllAuth a lembrar do usuário logado
+ACCOUNT_SESSION_REMEMBER = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
