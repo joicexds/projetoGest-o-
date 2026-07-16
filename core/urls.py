@@ -1,10 +1,11 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .forms import CustomLoginForm
 
 urlpatterns = [
     # A rota vazia '' agora é o login
-    path('', auth_views.LoginView.as_view(), name='login_home'),
+    path('', auth_views.LoginView.as_view(authentication_form=CustomLoginForm), name='login_home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('cadastro/', views.cadastro, name='cadastro'),
 
