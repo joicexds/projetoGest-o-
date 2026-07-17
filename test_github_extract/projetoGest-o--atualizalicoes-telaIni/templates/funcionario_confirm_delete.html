@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Funcionário - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Excluir Funcionário</h1>
+        </header>
+
+        <section class="content-area">
+            <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+                <h3 style="color: var(--error-color); margin-bottom: 1rem;">Tem certeza que deseja excluir?</h3>
+                <p style="margin-bottom: 2rem;">Você está prestes a excluir o funcionário <strong>{{ funcionario.nome }}</strong>. Esta ação não pode ser desfeita.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <a href="{% url 'funcionario_list' %}" class="btn" style="background-color: var(--secondary-color); color: var(--text-color); width: auto;">Cancelar</a>
+                        <button type="submit" class="btn" style="background-color: var(--error-color); color: white; width: auto;">Sim, Excluir</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

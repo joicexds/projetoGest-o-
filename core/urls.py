@@ -19,6 +19,18 @@ urlpatterns = [
     path('funcionarios/excluir/<int:id>/', views.funcionario_delete, name='funcionario_delete'),
     path('registros/excluir/<int:id>/', views.registro_trabalho_delete, name='registro_trabalho_delete'),
 
+    # Atestados e Apontamentos
+    path('acoes-rh/', views.acoes_rh, name='acoes_rh'),
+    path('atestados/', views.atestado_list, name='atestado_list'),
+    path('atestados/novo/', views.atestado_form_global, name='atestado_create_global'),
+    path('funcionarios/<int:func_id>/atestado/novo/', views.atestado_form, name='atestado_create'),
+    path('atestados/excluir/<int:id>/', views.atestado_delete, name='atestado_delete'),
+    
+    path('apontamentos/', views.apontamento_list, name='apontamento_list'),
+    path('apontamentos/novo/', views.apontamento_form_global, name='apontamento_create_global'),
+    path('funcionarios/<int:func_id>/apontamento/novo/', views.apontamento_form, name='apontamento_create'),
+    path('apontamentos/excluir/<int:id>/', views.apontamento_delete, name='apontamento_delete'),
+
     # Gastos
     path('gastos/', views.gasto_list, name='gasto_list'),
     path('gastos/novo/', views.gasto_form, name='gasto_create'),
@@ -38,6 +50,12 @@ urlpatterns = [
     path('receitas/novo/', views.receita_form, name='receita_create'),
     path('receitas/editar/<int:id>/', views.receita_form, name='receita_update'),
     path('receitas/excluir/<int:id>/', views.receita_delete, name='receita_delete'),
+
+    # Fazendas / Clientes
+    path('fazendas/', views.fazenda_list, name='fazenda_list'),
+    path('fazendas/novo/', views.fazenda_form, name='fazenda_create'),
+    path('fazendas/editar/<int:id>/', views.fazenda_form, name='fazenda_update'),
+    path('fazendas/excluir/<int:id>/', views.fazenda_delete, name='fazenda_delete'),
 
     # Relatórios
     path('relatorios/', views.relatorios, name='relatorios'),

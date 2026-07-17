@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Atestados - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Todos os Atestados</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="{% url 'atestado_create_global' %}" class="btn btn-primary" style="background-color: var(--primary-color); color: var(--bg-color);">+ Novo Atestado</a>
+                {% include 'includes/topbar_user.html' %}
+            </div>
+        </header>
+
+        <section class="content-area">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(255,255,255,0.05);">
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Funcionário</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Observação / CID</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Anexo</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for at in atestados %}
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 1rem; font-weight: bold; color: var(--primary-color);">
+                                <a href="{% url 'funcionario_detail' at.funcionario.id %}" style="text-decoration: none; color: inherit;">
+                                    {{ at.funcionario.nome }}
+                                </a>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 600;">{{ at.data_inicio|date:"d/m/Y" }} a {{ at.data_fim|date:"d/m/Y" }}</td>
+                            <td style="padding: 1rem;">{{ at.observacao|default:"-" }}</td>
+                            <td style="padding: 1rem;">
+                                {% if at.foto %}
+                                <a href="{{ at.foto.url }}" target="_blank" style="color: var(--primary-color);">Ver Foto</a>
+                                {% else %}
+                                Sem anexo
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem;">
+                                <form method="post" action="{% url 'atestado_delete' at.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum atestado encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

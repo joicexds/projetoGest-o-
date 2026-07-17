@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Fazenda/Cliente - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Confirmar Exclusão</h1>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area">
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 2rem;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background-color: rgba(255, 107, 107, 0.1); color: var(--error-color); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </div>
+                
+                <h2 style="margin-bottom: 1rem; color: var(--text-color);">Tem certeza?</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                    Você está prestes a excluir o cadastro de <strong>{{ fazenda.nome }}</strong>. <br>
+                    Esta ação não pode ser desfeita. (Gastos e receitas vinculados perderão esta associação).
+                </p>
+
+                <form method="post" style="display: flex; gap: 1rem;">
+                    {% csrf_token %}
+                    <a href="{% url 'fazenda_list' %}" class="btn" style="flex: 1; background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); text-decoration: none;">Cancelar</a>
+                    <button type="submit" class="btn" style="flex: 1; background-color: var(--error-color); color: white;">Sim, Excluir</button>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

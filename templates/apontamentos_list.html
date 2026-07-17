@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Fechamentos (Apontamentos) - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Fechamentos (Apontamentos)</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="{% url 'apontamento_create_global' %}" class="btn btn-primary" style="background-color: var(--primary-color); color: var(--bg-color);">+ Novo Fechamento</a>
+                {% include 'includes/topbar_user.html' %}
+            </div>
+        </header>
+
+        <section class="content-area">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(255,255,255,0.05);">
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Funcionário</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Dias Trab / Falta</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ganhos</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ap in apontamentos %}
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 1rem; font-weight: bold; color: var(--primary-color);">
+                                <a href="{% url 'funcionario_detail' ap.funcionario.id %}" style="text-decoration: none; color: inherit;">
+                                    {{ ap.funcionario.nome }}
+                                </a>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 600;">{{ ap.data_inicio|date:"d/m/Y" }} a {{ ap.data_fim|date:"d/m/Y" }}</td>
+                            <td style="padding: 1rem;">
+                                Trab: {{ ap.dias_trabalhados }} | Faltas: <span style="color: var(--error-color);">{{ ap.dias_falta }}</span>
+                            </td>
+                            <td style="padding: 1rem;">R$ {{ ap.calculo_ganhos|floatformat:2 }}</td>
+                            <td style="padding: 1rem;">
+                                <form method="post" action="{% url 'apontamento_delete' ap.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum apontamento/fechamento encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

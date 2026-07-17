@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Adiantamentos - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Gestão de Adiantamentos</h1>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-color);">Vales e Adiantamentos</h2>
+                <a href="{% url 'adiantamento_create' %}" class="btn" style="width: auto; background-color: var(--primary-color); color: var(--bg-color);">+ Novo Adiantamento</a>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Data</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Funcionário</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Valor</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Status</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ad in adiantamentos %}
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                            <td style="padding: 1rem 1.5rem;">{{ ad.data|date:"d/m/Y" }}</td>
+                            <td style="padding: 1rem 1.5rem; font-weight: 600;">{{ ad.funcionario.nome }}</td>
+                            <td style="padding: 1rem 1.5rem; color: #ff6b6b; font-weight: 700;">R$ {{ ad.valor|floatformat:2 }}</td>
+                            <td style="padding: 1rem 1.5rem;">
+                                {% if ad.status == 'PENDENTE' %}
+                                    <span style="background-color: rgba(255, 171, 0, 0.2); color: #ffab00; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">Pendente</span>
+                                {% else %}
+                                    <span style="background-color: rgba(152, 223, 88, 0.2); color: var(--primary-color); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">Descontado</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem 1.5rem;">
+                                <a href="{% url 'adiantamento_update' ad.id %}" style="color: var(--primary-color); margin-right: 1rem; font-size: 0.85rem;">Editar</a>
+                                <a href="{% url 'adiantamento_delete' ad.id %}" style="color: var(--error-color); font-size: 0.85rem;">Excluir</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                Nenhum adiantamento registrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

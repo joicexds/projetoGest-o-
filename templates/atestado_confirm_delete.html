@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Excluir Atestado{% endblock %}
+{% block content %}
+<div class="app-container">
+    <main class="main-content" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <div class="card" style="max-width: 400px; text-align: center;">
+            <h2 style="color: var(--error-color); margin-bottom: 1rem;">Excluir Atestado</h2>
+            <p>Tem certeza que deseja excluir o atestado de <strong>{{ atestado.funcionario.nome }}</strong> ({{ atestado.data_inicio|date:"d/m/Y" }} a {{ atestado.data_fim|date:"d/m/Y" }})?</p>
+            <form method="post" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                {% csrf_token %}
+                <a href="{% url 'funcionario_detail' atestado.funcionario.id %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn" style="background-color: var(--error-color); color: white;">Sim, Excluir</button>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

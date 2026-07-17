@@ -15,7 +15,9 @@
             
             <form action="{% url 'funcionario_list' %}" method="get" style="display: flex; gap: 8px; flex-grow: 1; max-width: 400px; margin: 0 1rem;">
                 <input type="search" name="q" placeholder="Pesquisar funcionário..." style="flex-grow: 1; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
-                <button type="submit" class="btn" style="width: auto; padding: 0.5rem 1rem;">🔍</button>
+                <button type="submit" class="btn" style="width: auto; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 1.2rem;">search</span>
+                </button>
             </form>
 
             <form method="get" class="month-filter-form" style="display: flex; align-items: center;">
@@ -82,12 +84,12 @@
 
                 <div class="card" style="padding: 1rem;">
                     <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Entradas</h3>
-                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff;">R$ {{ total_receitas|floatformat:2 }}</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">R$ {{ total_receitas|floatformat:2 }}</div>
                 </div>
 
                 <div class="card" style="padding: 1rem;">
                     <h3 style="color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.5rem; text-transform: uppercase;">Saídas</h3>
-                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff;">R$ {{ total_gastos|floatformat:2 }}</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--error-color);">R$ {{ total_gastos|floatformat:2 }}</div>
                 </div>
                 
                 <div class="card" style="padding: 1rem;">

@@ -10,76 +10,71 @@
         <header class="topbar">
             <h1>Perfil do Funcionário</h1>
             <div class="user-info" style="display: flex; gap: 1rem;">
+                <a href="{% url 'funcionario_holerite' funcionario.id %}" target="_blank" class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: var(--primary-color); color: #121212; display: flex; align-items: center; gap: 0.5rem; font-weight: bold; box-shadow: 0 2px 8px rgba(212, 244, 52, 0.3);">
+                    <span class="material-symbols-outlined" style="font-size: 1.2rem;">print</span> Imprimir Relatório
+                </a>
                 <a href="{% url 'funcionario_list' %}" class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem; background-color: var(--secondary-color); color: var(--text-color);">Voltar à Lista</a>
             </div>
         </header>
 
         <section class="content-area">
             <!-- DADOS BÁSICOS -->
-            <div class="card" style="margin-bottom: 2rem;">
+            <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.5rem;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
-                        <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 0.5rem;">{{ funcionario.nome }}</h2>
-                        <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 0.25rem;">{{ funcionario.nome }}</h2>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
                             {{ funcionario.cargo }} | CPF: {{ funcionario.cpf }} | {{ funcionario.get_tipo_pagamento_display }}
                         </div>
                     </div>
                     <div>
-                        <a href="{% url 'funcionario_update' funcionario.id %}" class="btn" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color);">Editar Dados</a>
+                        <a href="{% url 'funcionario_update' funcionario.id %}" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color);">Editar Dados</a>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
                     <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Salário Base / Mensal</div>
-                        <div style="font-size: 1.2rem; font-weight: 700;">R$ {{ funcionario.salario|floatformat:2 }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Salário Base / Mensal</div>
+                        <div style="font-size: 1rem; font-weight: 700;">R$ {{ funcionario.salario|floatformat:2 }}</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Valor da Diária</div>
-                        <div style="font-size: 1.2rem; font-weight: 700;">R$ {{ funcionario.valor_diaria|default:"0,00"|floatformat:2 }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Valor da Diária</div>
+                        <div style="font-size: 1rem; font-weight: 700;">R$ {{ funcionario.valor_diaria|default:"0,00"|floatformat:2 }}</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Próximo Pagamento</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">{{ funcionario.proximo_pagamento|date:"d/m/Y" }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Próximo Pagamento</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: var(--primary-color);">{{ funcionario.proximo_pagamento|date:"d/m/Y" }}</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Status</div>
                         {% if funcionario.ativo %}
-                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">Ativo</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--primary-color);">Ativo</div>
                         {% else %}
-                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--error-color);">Inativo</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--error-color);">Inativo</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- RESUMO E TOTALIZADORES -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                <div class="card" style="padding: 1.5rem;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Dias Trabalhados (Registrados)</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: #ffffff;">{{ dias_trabalhados }}</div>
-                    <div style="font-size: 0.8rem; color: var(--primary-color);">Total em diárias: R$ {{ total_diarias|floatformat:2 }}</div>
+            <!-- RESUMO E TOTALIZADORES + SALÁRIO -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="card" style="padding: 1rem;">
+                    <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Trabalho / Faltas / Atestados</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff;">{{ dias_trabalhados }}t / {{ dias_falta }}f / {{ dias_atestado }}a</div>
                 </div>
-                <div class="card" style="padding: 1.5rem;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Atestados / Faltas</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: #ffffff;">{{ dias_atestado }} / {{ dias_falta }}</div>
+                <div class="card" style="padding: 1rem; border-color: rgba(255,171,0,0.5);">
+                    <div style="font-size: 0.7rem; color: #ffab00; text-transform: uppercase;">Adiantamentos (Descontar)</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #ffab00;">R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
                 </div>
-                <div class="card" style="padding: 1.5rem; border-color: rgba(255,171,0,0.5);">
-                    <div style="font-size: 0.75rem; color: #ffab00; text-transform: uppercase;">Adiantamentos Pendentes (Descontar)</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: #ffab00;">R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
-                </div>
-            </div>
-
-            <!-- SALÁRIO LÍQUIDO DESTAQUE -->
-            <div class="card" style="margin-bottom: 2rem; background-color: rgba(212, 244, 52, 0.1); border-color: var(--primary-color);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <!-- SALÁRIO LÍQUIDO DESTAQUE -->
+                <div class="card" style="padding: 1rem; background-color: rgba(212, 244, 52, 0.1); border-color: var(--primary-color); display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="font-size: 0.9rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">Líquido a Receber (Cálculo Automático)</div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #ffffff;">R$ {{ salario_liquido|floatformat:2 }}</div>
+                        <div style="font-size: 0.75rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">Líquido a Receber (Geral)</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #ffffff;">R$ {{ salario_liquido|floatformat:2 }}</div>
                     </div>
-                    <div style="text-align: right; color: var(--text-muted); font-size: 0.8rem;">
-                        <div>Ganhos: R$ {{ total_ganhos|floatformat:2 }}</div>
-                        <div style="color: #ffab00;">Descontos: - R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
+                    <div style="text-align: right; color: var(--text-muted); font-size: 0.75rem;">
+                        <div>Bruto: R$ {{ total_ganhos|floatformat:2 }}</div>
+                        <div style="color: #ffab00;">Desc: - R$ {{ total_adiantado_pendente|floatformat:2 }}</div>
                     </div>
                 </div>
             </div>
@@ -89,77 +84,72 @@
                 
                 <!-- LANÇAMENTOS (REGISTRO E VALE) -->
                 <div style="display: flex; flex-direction: column; gap: 2rem;">
-                    <!-- NOVO REGISTRO DE TRABALHO -->
-                    <div class="card">
-                        <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem;">Lançar Dia / Atestado</h3>
-                        <form method="post" action="{% url 'funcionario_detail' funcionario.id %}">
-                            {% csrf_token %}
-                            {% for field in form_registro %}
-                            <div class="form-group" style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">{{ field.label }}</label>
-                                {{ field }}
-                            </div>
-                            {% endfor %}
-                            <button type="submit" name="submit_registro" class="btn" style="width: 100%; margin-top: 1rem; background-color: var(--primary-color); color: var(--bg-color);">Adicionar Registro</button>
-                        </form>
-                    </div>
-
                     <!-- NOVO VALE -->
-                    <div class="card" style="border-color: rgba(255,171,0,0.5);">
-                        <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: #ffab00;">Lançar Vale / Adiantamento</h3>
+                    <div class="card" style="border-color: rgba(255,171,0,0.5); padding: 1rem;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: #ffab00;">Lançar Vale</h3>
                         <form method="post" action="{% url 'funcionario_detail' funcionario.id %}">
                             {% csrf_token %}
-                            <!-- Escondendo o campo funcionario pois já está selecionado na view -->
                             <div style="display: none;">{{ form_adiantamento.funcionario }}</div>
                             
-                            <div class="form-group" style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Valor (R$)</label>
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">Valor (R$)</label>
                                 {{ form_adiantamento.valor }}
                             </div>
-                            <div class="form-group" style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Data do Vale</label>
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">Data do Vale</label>
                                 {{ form_adiantamento.data }}
                             </div>
-                            <div class="form-group" style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Observação</label>
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">Observação</label>
                                 {{ form_adiantamento.observacao }}
                             </div>
                             <div style="display: none;">{{ form_adiantamento.status }}</div>
                             
-                            <button type="submit" name="submit_adiantamento" class="btn" style="width: 100%; margin-top: 1rem; background-color: #ffab00; color: #121212;">Cadastrar Vale</button>
+                            <button type="submit" name="submit_adiantamento" class="btn" style="width: 100%; margin-top: 0.5rem; padding: 0.5rem; background-color: #ffab00; color: #121212;">Cadastrar Vale</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- HISTÓRICO DE TRABALHO E VALES -->
-                <div style="display: flex; flex-direction: column; gap: 2rem;">
-                    <!-- Tabela de Ponto -->
-                    <div class="card" style="padding: 0; overflow: hidden;">
-                        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                            <h3 style="font-size: 1.1rem; margin: 0;">Histórico de Ponto</h3>
-                        </div>
+                <!-- HISTÓRICOS EM ABAS -->
+                <div class="card" style="padding: 0; overflow: hidden; border-color: var(--border-color);">
+                    
+                    <!-- Cabeçalho das Abas -->
+                    <div style="display: flex; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02);">
+                        <button type="button" class="emp-tab-btn active" onclick="openEmpTab(event, 'tab-fechamentos')" style="flex: 1; padding: 1rem; background: none; border: none; color: var(--text-color); font-weight: bold; border-bottom: 2px solid var(--primary-color); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem;">assignment</span> Fechamentos
+                        </button>
+                        <button type="button" class="emp-tab-btn" onclick="openEmpTab(event, 'tab-atestados')" style="flex: 1; padding: 1rem; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem;">medical_services</span> Atestados
+                        </button>
+                        <button type="button" class="emp-tab-btn" onclick="openEmpTab(event, 'tab-vales')" style="flex: 1; padding: 1rem; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem;">payments</span> Vales
+                        </button>
+                    </div>
+
+                    <!-- CONTEÚDO DAS ABAS -->
+                    
+                    <!-- Aba 1: Fechamentos -->
+                    <div id="tab-fechamentos" class="emp-tab-content" style="display: block;">
                         <table style="width: 100%; border-collapse: collapse; text-align: left;">
                             <thead>
-                                <tr style="background-color: rgba(255,255,255,0.05);">
-                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Data</th>
-                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Tipo</th>
-                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Valor da Diária</th>
+                                <tr style="background-color: rgba(255,255,255,0.02);">
+                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Dias Trab/Falta</th>
                                     <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for reg in registros %}
+                                {% for ap in apontamentos %}
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td style="padding: 1rem; font-weight: 600;">{{ reg.data|date:"d/m/Y" }}</td>
+                                    <td style="padding: 1rem; font-weight: 600;">{{ ap.data_inicio|date:"d/m/Y" }} a {{ ap.data_fim|date:"d/m/Y" }}</td>
                                     <td style="padding: 1rem;">
-                                        {% if reg.tipo == 'PRESENCA' %}<span style="color: var(--primary-color);">Presença</span>
-                                        {% elif reg.tipo == 'FALTA' %}<span style="color: var(--error-color);">Falta</span>
-                                        {% elif reg.tipo == 'ATESTADO' %}<span style="color: #ffab00;">Atestado</span>
-                                        {% else %}Folga{% endif %}
+                                        Trabalhados: {{ ap.dias_trabalhados }} <br>
+                                        Faltas: <span style="color: var(--error-color);">{{ ap.dias_falta }}</span>
+                                        {% if ap.valor_horas_extras > 0 %}<br><small style="color: var(--primary-color);">+ Extra: R$ {{ ap.valor_horas_extras|floatformat:2 }}</small>{% endif %}
+                                        {% if ap.bonificacao > 0 %}<br><small style="color: var(--primary-color);">+ Bônus: R$ {{ ap.bonificacao|floatformat:2 }}</small>{% endif %}
                                     </td>
-                                    <td style="padding: 1rem;">R$ {{ reg.valor_diaria_aplicada|floatformat:2 }}</td>
                                     <td style="padding: 1rem;">
-                                        <form method="post" action="{% url 'registro_trabalho_delete' reg.id %}" style="display:inline;">
+                                        <form method="post" action="{% url 'apontamento_delete' ap.id %}" style="display:inline;">
                                             {% csrf_token %}
                                             <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
                                         </form>
@@ -167,21 +157,55 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum registro encontrado.</td>
+                                    <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum apontamento encontrado.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Tabela de Vales -->
-                    <div class="card" style="padding: 0; overflow: hidden; border-color: rgba(255,171,0,0.5);">
-                        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                            <h3 style="font-size: 1.1rem; margin: 0; color: #ffab00;">Histórico de Vales</h3>
-                        </div>
+                    <!-- Aba 2: Atestados -->
+                    <div id="tab-atestados" class="emp-tab-content" style="display: none;">
                         <table style="width: 100%; border-collapse: collapse; text-align: left;">
                             <thead>
-                                <tr style="background-color: rgba(255,255,255,0.05);">
+                                <tr style="background-color: rgba(255,255,255,0.02);">
+                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Anexo</th>
+                                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for at in atestados %}
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 1rem; font-weight: 600;">{{ at.data_inicio|date:"d/m/Y" }} a {{ at.data_fim|date:"d/m/Y" }}</td>
+                                    <td style="padding: 1rem;">
+                                        {% if at.foto %}
+                                        <a href="{{ at.foto.url }}" target="_blank" style="color: var(--primary-color);">Ver Foto</a>
+                                        {% else %}
+                                        Sem anexo
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <form method="post" action="{% url 'atestado_delete' at.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum atestado encontrado.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Aba 3: Vales -->
+                    <div id="tab-vales" class="emp-tab-content" style="display: none;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="background-color: rgba(255,255,255,0.02);">
                                     <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Data</th>
                                     <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Status</th>
                                     <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Valor Retirado</th>
@@ -194,7 +218,7 @@
                                     <td style="padding: 1rem; font-weight: 600;">{{ ad.data|date:"d/m/Y" }}</td>
                                     <td style="padding: 1rem;">
                                         {% if ad.status == 'PENDENTE' %}
-                                        <span style="color: #ffab00;">Pendente (Descontar)</span>
+                                        <span style="color: #ffab00; font-weight: bold;">Pendente</span>
                                         {% else %}
                                         <span style="color: var(--primary-color);">Já Descontado</span>
                                         {% endif %}
@@ -218,12 +242,6 @@
                 </div>
 
             </div>
-
-            <div style="margin-top: 3rem; text-align: center;">
-                <a href="{% url 'funcionario_holerite' funcionario.id %}" target="_blank" title="Imprimir Relatório" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: #ffffff; color: #121212; font-size: 1.5rem; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">
-                    🖨️
-                </a>
-            </div>
         </section>
     </main>
 </div>
@@ -242,4 +260,29 @@
         border-color: var(--primary-color);
     }
 </style>
+<script>
+    function openEmpTab(evt, tabName) {
+        // Esconder todos os conteudos de abas
+        var tabcontent = document.getElementsByClassName("emp-tab-content");
+        for (var i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Remover classe active e estilo das abas
+        var tablinks = document.getElementsByClassName("emp-tab-btn");
+        for (var i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+            tablinks[i].style.color = "var(--text-muted)";
+            tablinks[i].style.fontWeight = "normal";
+            tablinks[i].style.borderBottom = "2px solid transparent";
+        }
+
+        // Mostrar a aba atual, e adicionar estilo ativo ao botao
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+        evt.currentTarget.style.color = "var(--text-color)";
+        evt.currentTarget.style.fontWeight = "bold";
+        evt.currentTarget.style.borderBottom = "2px solid var(--primary-color)";
+    }
+</script>
 {% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Funcionários - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Gestão de Funcionários</h1>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-color);">Equipe</h2>
+                
+                <form method="get" style="display: flex; flex-grow: 1; max-width: 400px; gap: 8px;">
+                    <input type="search" name="q" value="{{ q }}" placeholder="Buscar funcionário por nome..." style="flex-grow: 1; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
+                    <button type="submit" class="btn" style="width: auto; padding: 0.5rem 1rem;">Buscar</button>
+                </form>
+
+                <a href="{% url 'funcionario_create' %}" class="btn" style="width: auto;">+ Novo Funcionário</a>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Nome</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Cargo</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Status</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for func in funcionarios %}
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                            <td style="padding: 1rem 1.5rem;">
+                                <a href="{% url 'funcionario_detail' func.id %}" style="text-decoration: none; color: inherit;">
+                                    <div style="font-weight: 600; color: var(--text-color); transition: color 0.2s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-color)'">{{ func.nome }}</div>
+                                </a>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">CPF: {{ func.cpf }}</div>
+                            </td>
+                            <td style="padding: 1rem 1.5rem;">{{ func.cargo }}</td>
+                            <td style="padding: 1rem 1.5rem;">
+                                {% if func.ativo %}
+                                    <span style="background-color: rgba(152, 223, 88, 0.2); color: var(--primary-color); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">Ativo</span>
+                                {% else %}
+                                    <span style="background-color: rgba(255, 107, 107, 0.2); color: var(--error-color); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem 1.5rem;">
+                                <a href="{% url 'funcionario_update' func.id %}" style="color: var(--primary-color); margin-right: 1rem; font-size: 0.85rem;">Editar</a>
+                                <a href="{% url 'funcionario_delete' func.id %}" style="color: var(--error-color); font-size: 0.85rem;">Excluir</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                Nenhum funcionário cadastrado ainda.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

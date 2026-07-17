@@ -1,0 +1,10 @@
+<div class="user-info" style="display: flex; align-items: center; gap: 0.5rem; background: var(--card-bg); padding: 0.25rem 0.75rem; border-radius: 20px; border: 1px solid var(--border-color);">
+    {% if user.profile and user.profile.foto %}
+        <img src="{{ user.profile.foto.url }}" alt="Foto" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+    {% else %}
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">
+            {{ user.first_name|default:user.username|slice:":1"|upper }}
+        </div>
+    {% endif %}
+    <span>Olá, <a href="{% url 'perfil' %}" style="text-decoration: underline; color: var(--text-color);">{{ user.first_name|default:user.username }}</a></span>
+</div>

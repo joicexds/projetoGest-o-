@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Atestado - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                {% if is_global %}
+                <a href="/acoes-rh/?tab=atestados" class="btn-back">← Voltar</a>
+                <h1>Registrar Novo Atestado</h1>
+                {% else %}
+                <a href="{% url 'funcionario_detail' funcionario.id %}" class="btn-back">← Voltar</a>
+                <h1>Atestado Médico para {{ funcionario.nome }}</h1>
+                {% endif %}
+            </div>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area" style="max-width: 1200px; margin: 0 auto;">
+            <div class="form-split-container">
+                <!-- COLUNA 1: FORMULÁRIO -->
+                <div class="card form-card-modern" style="flex: 1.2; min-width: 320px;">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- DADOS DO FUNCIONÁRIO -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">person</span></span>
+                            <div>
+                                <h3>Funcionário</h3>
+                                <p>Selecione ou confirme o funcionário associado ao atestado</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group-container">
+                            {% if is_global %}
+                            <div class="form-group-modern">
+                                <label for="id_funcionario">Selecione o Funcionário</label>
+                                {{ form.funcionario }}
+                            </div>
+                            {% else %}
+                            <div style="display: none;">
+                                {{ form.funcionario }}
+                            </div>
+                            <div class="selected-employee-box">
+                                <span class="avatar-stub"><span class="material-symbols-outlined">person</span></span>
+                                <div>
+                                    <span class="label">Funcionário Selecionado</span>
+                                    <strong class="name">{{ funcionario.nome }}</strong>
+                                    <span class="badge">{{ funcionario.get_tipo_pagamento_display }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <!-- PERÍODO E DATAS -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">calendar_month</span></span>
+                            <div>
+                                <h3>Período de Afastamento</h3>
+                                <p>Defina as datas de início e fim da licença médica</p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div class="form-group-modern">
+                                <label for="id_data_inicio">Data de Início</label>
+                                {{ form.data_inicio }}
+                            </div>
+                            <div class="form-group-modern">
+                                <label for="id_data_fim">Data de Retorno</label>
+                                {{ form.data_fim }}
+                            </div>
+                        </div>
+
+                        <!-- Duração Dinâmica -->
+                        <div id="atestado-duration-box" style="display: none;" class="info-alert-box">
+                            <span class="material-symbols-outlined">info</span>
+                            <span id="atestado-duration-text">Duração estimada do afastamento: 0 dias</span>
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <!-- COMPROVANTE E OBSERVAÇÃO -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">description</span></span>
+                            <div>
+                                <h3>Comprovante & Detalhes</h3>
+                                <p>Anexe a foto do documento e adicione observações ou CID</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label for="id_observacao">Observação / CID</label>
+                            {{ form.observacao }}
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label>Foto/Imagem do Atestado</label>
+                            <div class="file-upload-wrapper">
+                                <label for="id_foto" class="file-upload-btn" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                                    <span class="material-symbols-outlined">photo_camera</span> Escolher Arquivo ou Tirar Foto
+                                </label>
+                                <span id="file-name-display" class="file-name-display">Nenhum arquivo selecionado</span>
+                                {{ form.foto }}
+                            </div>
+                        </div>
+
+                        <!-- BOTÕES DE AÇÃO -->
+                        <div class="form-actions-modern">
+                            {% if is_global %}
+                            <a href="/acoes-rh/?tab=atestados" class="btn-cancel">Cancelar</a>
+                            {% else %}
+                            <a href="{% url 'funcionario_detail' funcionario.id %}" class="btn-cancel">Cancelar</a>
+                            {% endif %}
+                            <button type="submit" class="btn-submit">Salvar Atestado</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- COLUNA 2: REGRAS E PREVIEW -->
+                <div class="card info-sidebar-card" style="flex: 0.8; min-width: 320px;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1rem; color: var(--primary-color); margin-bottom: 1rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">assignment</span> Regras de Afastamento (CLT)
+                        </h3>
+                        <ul style="color: var(--text-muted); font-size: 0.85rem; padding-left: 1.25rem; line-height: 1.6; display: flex; flex-direction: column; gap: 0.75rem; list-style-type: disc;">
+                            <li>O atestado médico deve ser entregue em até <strong>48 horas</strong> após o início do afastamento.</li>
+                            <li>O documento deve conter de forma legível: nome do funcionário, data de emissão, período de afastamento e assinatura/carimbo do médico com CRM.</li>
+                            <li>A inclusão do <strong>código CID</strong> é recomendada, mas opcional (requer consentimento do paciente).</li>
+                        </ul>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                        <h3 style="font-size: 1rem; color: var(--primary-color); margin-bottom: 1rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">preview</span> Pré-visualização do Documento
+                        </h3>
+                        <div id="image-preview-container" style="border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; color: var(--text-muted); min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: rgba(0,0,0,0.15);">
+                            <div id="preview-placeholder">
+                                <span class="material-symbols-outlined" style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">description</span>
+                                Nenhuma imagem ou foto selecionada
+                            </div>
+                            <img id="preview-image" src="" alt="Atestado" style="max-width: 100%; max-height: 350px; display: none; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<style>
+    /* Estilos de Layout Split */
+    .form-split-container {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+    .info-sidebar-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    /* Estilos Modernos e Comerciais */
+    .form-card-modern {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .btn-back {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: var(--text-color);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-back:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-section-header h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-color);
+    }
+    .form-section-header p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0.25rem 0 0 0;
+    }
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: var(--secondary-color);
+        border-radius: 50%;
+        font-size: 1.2rem;
+    }
+
+    .section-divider {
+        border: 0;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .form-group-modern label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group-modern input[type="date"],
+    .form-group-modern select,
+    .form-group-modern textarea {
+        width: 100%;
+        padding: 0.85rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    .form-group-modern input[type="date"]:focus,
+    .form-group-modern select:focus,
+    .form-group-modern textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(212, 244, 52, 0.15);
+    }
+
+    .selected-employee-box {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background-color: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .avatar-stub {
+        font-size: 1.8rem;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .selected-employee-box div {
+        display: flex;
+        flex-direction: column;
+    }
+    .selected-employee-box .label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .selected-employee-box .name {
+        font-size: 1.15rem;
+        color: var(--text-color);
+    }
+    .selected-employee-box .badge {
+        display: inline-block;
+        align-self: flex-start;
+        font-size: 0.7rem;
+        background-color: var(--primary-color);
+        color: #000;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 0.25rem;
+    }
+
+    .info-alert-box {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: rgba(212, 244, 52, 0.05);
+        border: 1px solid rgba(212, 244, 52, 0.2);
+        color: var(--text-color);
+        padding: 0.85rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Upload de arquivo customizado */
+    .file-upload-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .file-upload-btn {
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        padding: 0.85rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s;
+    }
+    .file-upload-btn:hover {
+        background-color: var(--card-bg);
+        border-color: var(--primary-color);
+    }
+    .file-name-display {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* Esconder input file padrão */
+    .file-upload-wrapper input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+    }
+
+    /* Ações */
+    .form-actions-modern {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+    .btn-cancel {
+        background-color: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        padding: 0.85rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .btn-cancel:hover {
+        background-color: var(--secondary-color);
+    }
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: #000;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-submit:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    @media(max-width: 500px) {
+        .form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+        .file-upload-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<script>
+    // Listener de arquivo selecionado e pré-visualização
+    const fileInput = document.getElementById('id_foto');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const previewPlaceholder = document.getElementById('preview-placeholder');
+    const previewImage = document.getElementById('preview-image');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileNameDisplay.textContent = file.name;
+                fileNameDisplay.style.color = 'var(--text-color)';
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        previewImage.src = event.target.result;
+                        previewImage.style.display = 'block';
+                        previewPlaceholder.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.style.display = 'none';
+                    previewPlaceholder.style.display = 'block';
+                    previewPlaceholder.innerHTML = `<span class="material-symbols-outlined" style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">folder</span>${file.name}<br><span style="font-size: 0.75rem; color: var(--text-muted);">(Arquivo selecionado)</span>`;
+                }
+            } else {
+                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+                fileNameDisplay.style.color = 'var(--text-muted)';
+                previewImage.style.display = 'none';
+                previewPlaceholder.style.display = 'block';
+                previewPlaceholder.innerHTML = `<span class="material-symbols-outlined" style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">description</span>Nenhuma imagem ou foto selecionada`;
+            }
+        });
+    }
+
+    // Calcular dias do atestado
+    const dateInicio = document.getElementById('id_data_inicio');
+    const dateFim = document.getElementById('id_data_fim');
+    const durationBox = document.getElementById('atestado-duration-box');
+    const durationText = document.getElementById('atestado-duration-text');
+
+    function calculateAtestadoDays() {
+        const startVal = dateInicio.value;
+        const endVal = dateFim.value;
+        if (startVal && endVal) {
+            const d1 = new Date(startVal);
+            const d2 = new Date(endVal);
+            if (d2 >= d1) {
+                const diffTime = Math.abs(d2 - d1);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                durationText.innerHTML = `<span class="material-symbols-outlined" style="vertical-align: middle;">medical_services</span> Duração estimada do afastamento: ${diffDays} dia(s).`;
+                durationBox.style.display = 'flex';
+            } else {
+                durationBox.style.display = 'none';
+            }
+        } else {
+            durationBox.style.display = 'none';
+        }
+    }
+
+    if (dateInicio && dateFim) {
+        dateInicio.addEventListener('change', calculateAtestadoDays);
+        dateFim.addEventListener('change', calculateAtestadoDays);
+        calculateAtestadoDays(); // Run on load
+    }
+</script>
+{% endblock %}

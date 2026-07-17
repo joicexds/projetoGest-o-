@@ -1,0 +1,868 @@
+{% extends 'base.html' %}
+
+{% block title %}Apontamento Mensal - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                {% if is_global %}
+                <a href="/acoes-rh/?tab=fechamentos" class="btn-back">← Voltar</a>
+                <h1>Registrar Novo Fechamento</h1>
+                {% else %}
+                <a href="{% url 'funcionario_detail' funcionario.id %}" class="btn-back">← Voltar</a>
+                <h1>Fechamento para {{ funcionario.nome }}</h1>
+                {% endif %}
+            </div>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area" style="max-width: 1200px; margin: 0 auto;">
+            <div class="form-split-container">
+                <!-- COLUNA 1: FORMULÁRIO -->
+                <div class="card form-card-modern" style="flex: 1; min-width: 320px;">
+                    {% if form.errors %}
+                    <div style="background-color: rgba(244, 67, 54, 0.1); border: 1px solid var(--error-color); color: var(--error-color); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <strong style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;"><span class="material-symbols-outlined">warning</span> Por favor, corrija os erros abaixo:</strong>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                <li>{{ field|capfirst }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- DADOS DO FUNCIONÁRIO -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">person</span></span>
+                            <div>
+                                <h3>Funcionário</h3>
+                                <p>Defina o destinatário do fechamento</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group-container">
+                            {% if is_global %}
+                            <div class="form-group-modern">
+                                <label for="id_funcionario">Selecione o Funcionário</label>
+                                {{ form.funcionario }}
+                            </div>
+                            {% else %}
+                            <div style="display: none;">
+                                {{ form.funcionario }}
+                            </div>
+                            <div class="selected-employee-box">
+                                <span class="avatar-stub"><span class="material-symbols-outlined">person</span></span>
+                                <div>
+                                    <span class="label">Funcionário Selecionado</span>
+                                    <strong class="name">{{ funcionario.nome }}</strong>
+                                    <span class="badge">{{ funcionario.get_tipo_pagamento_display }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <!-- PERÍODO DO FECHAMENTO -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">calendar_month</span></span>
+                            <div>
+                                <h3>Período do Fechamento</h3>
+                                <p>Defina o intervalo de dias do fechamento</p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div class="form-group-modern">
+                                <label for="id_data_inicio">Data Inicial</label>
+                                {{ form.data_inicio }}
+                            </div>
+                            <div class="form-group-modern">
+                                <label for="id_data_fim">Data Final</label>
+                                {{ form.data_fim }}
+                            </div>
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <!-- APONTAMENTO DE TRABALHO -->
+                        <div class="form-section-header">
+                            <span class="icon-circle"><span class="material-symbols-outlined">edit_document</span></span>
+                            <div>
+                                <h3>Apontamento de Dias</h3>
+                                <p>Insira a quantidade de trabalho e faltas</p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div class="form-group-modern">
+                                <label for="id_dias_trabalhados">Dias Trabalhados</label>
+                                {{ form.dias_trabalhados }}
+                                <small style="color: var(--text-muted); font-size: 0.75rem;">Para Diaristas</small>
+                            </div>
+                            <div class="form-group-modern">
+                                <label for="id_dias_falta">Dias de Falta</label>
+                                {{ form.dias_falta }}
+                                <small style="color: var(--text-muted); font-size: 0.75rem;">Para Mensalistas</small>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2" style="margin-top: 1.5rem;">
+                            <div class="form-group-modern">
+                                <label for="id_valor_horas_extras">Horas Extras (R$)</label>
+                                {{ form.valor_horas_extras }}
+                            </div>
+                            <div class="form-group-modern">
+                                <label for="id_bonificacao">Bonificação (R$)</label>
+                                {{ form.bonificacao }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-modern" style="margin-top: 1.5rem;">
+                            <label for="id_observacao">Observações do Fechamento</label>
+                            {{ form.observacao }}
+                        </div>
+
+                        <div class="form-actions-modern" style="margin-top: 2rem;">
+                            {% if is_global %}
+                            <a href="/acoes-rh/?tab=fechamentos" class="btn-cancel">Cancelar</a>
+                            {% else %}
+                            <a href="{% url 'funcionario_detail' funcionario.id %}" class="btn-cancel">Cancelar</a>
+                            {% endif %}
+                            <button type="submit" class="btn-submit">Salvar Fechamento</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- COLUNA 2: CALCULO / SIMULADOR DE HOLERITE -->
+                <div class="card calculation-sidebar-card">
+                    <div class="paycheck-simulator">
+                        <div class="paycheck-header">
+                            <div class="logo">FLORASYLVER</div>
+                            <div class="title">Demonstrativo de Fechamento Simulado</div>
+                        </div>
+                        
+                        <div class="paycheck-employee-details">
+                            <div>
+                                <span class="label">Funcionário:</span>
+                                <span id="sim-nome" class="val">---</span>
+                            </div>
+                            <div>
+                                <span class="label">Contrato:</span>
+                                <span id="sim-tipo" class="val badge-sim">---</span>
+                            </div>
+                            <div>
+                                <span class="label">Período:</span>
+                                <span id="sim-periodo" class="val">---</span>
+                            </div>
+                        </div>
+
+                        <table class="paycheck-table">
+                            <thead>
+                                <tr>
+                                    <th>Cód. / Descrição</th>
+                                    <th>Ref.</th>
+                                    <th style="text-align: right;">Vencimento</th>
+                                    <th style="text-align: right;">Desconto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="row-ganho-base">
+                                    <td>
+                                        <strong id="sim-desc-ganho">Salário Mensal Base</strong>
+                                    </td>
+                                    <td id="sim-ref-ganho">30d</td>
+                                    <td id="sim-val-ganho" style="text-align: right;">R$ 0,00</td>
+                                    <td style="text-align: right; color: var(--text-muted);">-</td>
+                                </tr>
+                                <tr id="row-ganho-extra" style="display: none;">
+                                    <td>Horas Extras / Bonificação</td>
+                                    <td id="sim-ref-extra">-</td>
+                                    <td id="sim-val-extra" style="text-align: right; color: var(--primary-color);">R$ 0,00</td>
+                                    <td style="text-align: right; color: var(--text-muted);">-</td>
+                                </tr>
+                                <tr id="row-desconto-adiantamento" style="display: none;">
+                                    <td>Desconto Vales (Adiant.)</td>
+                                    <td id="sim-ref-adiantamento">0 vales</td>
+                                    <td style="text-align: right; color: var(--text-muted);">-</td>
+                                    <td id="sim-val-adiantamento" style="text-align: right; color: var(--error-color);">R$ 0,00</td>
+                                </tr>
+                                <tr id="row-desconto-falta">
+                                    <td>Desconto Faltas</td>
+                                    <td id="sim-ref-falta">0d</td>
+                                    <td style="text-align: right; color: var(--text-muted);">-</td>
+                                    <td id="sim-val-falta" style="text-align: right; color: var(--error-color);">R$ 0,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="paycheck-summary">
+                            <div class="summary-line">
+                                <span>Total de Ganhos:</span>
+                                <span id="sim-total-bruto" class="val">R$ 0,00</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>Total de Descontos:</span>
+                                <span id="sim-total-desconto" class="val" style="color: var(--error-color);">R$ 0,00</span>
+                            </div>
+                            <div class="summary-line net-line">
+                                <span>VALOR LÍQUIDO SIMULADO:</span>
+                                <span id="sim-total-liquido" class="val">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ABAS DE AUDITORIA DO PERÍODO NO FECHAMENTO -->
+                    <div class="card" style="margin-top: 1.5rem; padding: 1.5rem; border: 1px solid var(--border-color); background-color: var(--card-bg);">
+                        <div class="tabs-container">
+                            <div class="tab-buttons" style="display: flex; gap: 10px; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                                <button type="button" class="tab-btn active" onclick="switchClosureTab(event, 'tab-vales-list')" style="background: none; border: none; color: var(--text-color); font-weight: bold; cursor: pointer; padding: 5px 10px; border-bottom: 2px solid var(--primary-color);">Vales no Período</button>
+                                <button type="button" class="tab-btn" onclick="switchClosureTab(event, 'tab-registros-list')" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 5px 10px;">Folhas Diárias</button>
+                            </div>
+                            
+                            <div id="tab-vales-list" class="closure-tab-content" style="display: block;">
+                                <div id="closure-vales-empty" style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Selecione um funcionário e datas válidas.</div>
+                                <ul id="closure-vales-ul" style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;"></ul>
+                            </div>
+                            
+                            <div id="tab-registros-list" class="closure-tab-content" style="display: none;">
+                                <div id="closure-registros-empty" style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Selecione um funcionário e datas válidas.</div>
+                                <ul id="closure-registros-ul" style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<style>
+    .form-split-container {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .form-card-modern {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .btn-back {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: var(--text-color);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-back:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-section-header h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-color);
+    }
+    .form-section-header p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0.25rem 0 0 0;
+    }
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: var(--secondary-color);
+        border-radius: 50%;
+        font-size: 1.2rem;
+    }
+
+    .section-divider {
+        border: 0;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .form-group-modern label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group-modern input[type="date"],
+    .form-group-modern select,
+    .form-group-modern textarea,
+    .form-group-modern input[type="number"] {
+        width: 100%;
+        padding: 0.85rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    .form-group-modern input:focus,
+    .form-group-modern select:focus,
+    .form-group-modern textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(212, 244, 52, 0.15);
+    }
+
+    .selected-employee-box {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background-color: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .avatar-stub {
+        font-size: 1.8rem;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .selected-employee-box div {
+        display: flex;
+        flex-direction: column;
+    }
+    .selected-employee-box .label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .selected-employee-box .name {
+        font-size: 1.15rem;
+        color: var(--text-color);
+    }
+    .selected-employee-box .badge {
+        display: inline-block;
+        align-self: flex-start;
+        font-size: 0.7rem;
+        background-color: var(--primary-color);
+        color: #000;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 0.25rem;
+    }
+
+    /* Ações */
+    .form-actions-modern {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    .btn-cancel {
+        background-color: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        padding: 0.85rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .btn-cancel:hover {
+        background-color: var(--secondary-color);
+    }
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: #000;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-submit:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    /* CARD DE SIMULAÇÃO (HOLERITE) */
+    .calculation-sidebar-card {
+        flex: 1;
+        min-width: 320px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .paycheck-simulator {
+        font-family: monospace, Courier, monospace;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+        background-color: #0c0f12;
+        border-radius: 8px;
+    }
+
+    .paycheck-header {
+        border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    .paycheck-header .logo {
+        font-size: 1.3rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        color: var(--primary-color);
+    }
+    .paycheck-header .title {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+    }
+
+    .paycheck-employee-details {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .paycheck-employee-details div {
+        display: flex;
+        justify-content: space-between;
+    }
+    .paycheck-employee-details .label {
+        color: var(--text-muted);
+    }
+    .paycheck-employee-details .val {
+        color: var(--text-color);
+        font-weight: bold;
+    }
+    .badge-sim {
+        background-color: var(--secondary-color);
+        padding: 0 0.4rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+    }
+
+    .paycheck-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+    .paycheck-table th {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+        padding: 0.5rem 0;
+        text-align: left;
+        font-weight: 500;
+    }
+    .paycheck-table td {
+        padding: 0.5rem 0;
+        color: var(--text-color);
+    }
+
+    .paycheck-summary {
+        border-top: 2px dashed rgba(255, 255, 255, 0.15);
+        padding-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .paycheck-summary .summary-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+    }
+    .paycheck-summary .summary-line.net-line {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px double rgba(255, 255, 255, 0.2);
+        font-size: 1.05rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+</style>
+
+<script>
+    const isGlobal = "{{ is_global|yesno:'true,false' }}" === "true";
+    let tipoPagamento = "{{ funcionario.tipo_pagamento|default:'' }}";
+    let valorDiaria = parseFloat("{{ funcionario.valor_diaria|default:0 }}".replace(',', '.'));
+    let salarioMensal = parseFloat("{{ funcionario.salario|default:0 }}".replace(',', '.'));
+    let funcionarioNome = "{{ funcionario.nome|default:'---' }}";
+    
+    let funcionariosDados = {};
+    {% if funcionarios_dados %}
+    funcionariosDados = {{ funcionarios_dados|safe }};
+    {% endif %}
+
+    const selectFuncionario = document.getElementById('id_funcionario');
+    const inputDataInicio = document.getElementById('id_data_inicio');
+    const inputDataFim = document.getElementById('id_data_fim');
+    const inputDiasTrab = document.getElementById('id_dias_trabalhados');
+    const inputFaltas = document.getElementById('id_dias_falta');
+    const inputHorasExtras = document.getElementById('id_valor_horas_extras');
+    const inputBonificacao = document.getElementById('id_bonificacao');
+    
+    // Elementos do Simulador (Holerite)
+    const simNome = document.getElementById('sim-nome');
+    const simTipo = document.getElementById('sim-tipo');
+    const simPeriodo = document.getElementById('sim-periodo');
+    const simDescGanho = document.getElementById('sim-desc-ganho');
+    const simRefGanho = document.getElementById('sim-ref-ganho');
+    const simValGanho = document.getElementById('sim-val-ganho');
+    const simRefFalta = document.getElementById('sim-ref-falta');
+    const simValFalta = document.getElementById('sim-val-falta');
+    const simTotalBruto = document.getElementById('sim-total-bruto');
+    const simTotalDesconto = document.getElementById('sim-total-desconto');
+    const simTotalLiquido = document.getElementById('sim-total-liquido');
+
+    function formatCurrency(value) {
+        return "R$ " + value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatDateBr(dateString) {
+        if (!dateString) return '';
+        const parts = dateString.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0].substring(2)}`;
+        }
+        return dateString;
+    }
+
+    function updateCalculations() {
+        let adiantamentos = [];
+        if (isGlobal && selectFuncionario) {
+            const funcId = selectFuncionario.value;
+            if (funcId && funcionariosDados[funcId]) {
+                const dados = funcionariosDados[funcId];
+                tipoPagamento = dados.tipo_pagamento;
+                valorDiaria = dados.valor_diaria;
+                salarioMensal = dados.salario;
+                adiantamentos = dados.adiantamentos || [];
+                funcionarioNome = selectFuncionario.options[selectFuncionario.selectedIndex].text;
+            } else {
+                tipoPagamento = '';
+                valorDiaria = 0;
+                salarioMensal = 0;
+                adiantamentos = [];
+                funcionarioNome = '---';
+            }
+        } else {
+            const funcId = "{{ funcionario.id }}";
+            if (funcId && funcionariosDados[funcId]) {
+                const dados = funcionariosDados[funcId];
+                tipoPagamento = dados.tipo_pagamento;
+                valorDiaria = dados.valor_diaria;
+                salarioMensal = dados.salario;
+                adiantamentos = dados.adiantamentos || [];
+                funcionarioNome = "{{ funcionario.nome|default:'---' }}";
+            }
+        }
+
+        // Configura inputs baseado no tipo de pagamento
+        if (tipoPagamento === 'MENSALISTA') {
+            inputDiasTrab.disabled = true;
+            inputDiasTrab.value = 0;
+            inputFaltas.disabled = false;
+        } else if (tipoPagamento === 'DIARISTA') {
+            inputDiasTrab.disabled = false;
+            inputFaltas.disabled = true;
+            inputFaltas.value = 0;
+        } else {
+            inputDiasTrab.disabled = true;
+            inputFaltas.disabled = true;
+        }
+
+        let dataInicioVal = inputDataInicio.value;
+        let dataFimVal = inputDataFim.value;
+        let diasTotaisPeriodo = 0;
+
+        if (dataInicioVal && dataFimVal) {
+            let data1 = new Date(dataInicioVal);
+            let data2 = new Date(dataFimVal);
+            if (data2 >= data1) {
+                let diffTime = Math.abs(data2 - data1);
+                diasTotaisPeriodo = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            }
+        }
+
+        if (dataInicioVal && dataFimVal) {
+            let funcId = isGlobal ? (selectFuncionario ? selectFuncionario.value : null) : "{{ funcionario.id }}";
+            let countPresenca = 0;
+            let countFalta = 0;
+            let hasRecords = false;
+
+            if (funcId && funcionariosDados[funcId] && funcionariosDados[funcId].registros) {
+                const regs = funcionariosDados[funcId].registros;
+                const dInicio = new Date(dataInicioVal + 'T00:00:00');
+                const dFim = new Date(dataFimVal + 'T23:59:59');
+
+                regs.forEach(r => {
+                    const dReg = new Date(r.data + 'T12:00:00');
+                    if (dReg >= dInicio && dReg <= dFim) {
+                        hasRecords = true;
+                        if (r.tipo === 'PRESENCA') {
+                            countPresenca++;
+                        } else if (r.tipo === 'FALTA') {
+                            countFalta++;
+                        }
+                    }
+                });
+            }
+
+            if (hasRecords) {
+                if (tipoPagamento === 'DIARISTA' && document.activeElement !== inputDiasTrab) {
+                    inputDiasTrab.value = countPresenca;
+                } else if (tipoPagamento === 'MENSALISTA' && document.activeElement !== inputFaltas) {
+                    inputFaltas.value = countFalta;
+                }
+            } else {
+                if (tipoPagamento === 'DIARISTA' && diasTotaisPeriodo > 0 && document.activeElement !== inputDiasTrab) {
+                    inputDiasTrab.value = diasTotaisPeriodo;
+                } else if (tipoPagamento === 'MENSALISTA' && document.activeElement !== inputFaltas) {
+                    inputFaltas.value = 0;
+                }
+            }
+        }
+
+        let diasTrab = parseInt(inputDiasTrab.value) || 0;
+        let diasFalt = parseInt(inputFaltas.value) || 0;
+        let valHorasExtras = parseFloat(inputHorasExtras ? inputHorasExtras.value.replace(',', '.') : 0) || 0;
+        let valBonificacao = parseFloat(inputBonificacao ? inputBonificacao.value.replace(',', '.') : 0) || 0;
+        
+        let ganhos = 0;
+        let desconto = 0;
+        
+        if (tipoPagamento === 'DIARISTA') {
+            ganhos = diasTrab * valorDiaria;
+        } else if (tipoPagamento === 'MENSALISTA') {
+            ganhos = salarioMensal;
+            let valorDiaMensal = salarioMensal / 30.0;
+            desconto = diasFalt * valorDiaMensal;
+        }
+
+        ganhos = ganhos + valHorasExtras + valBonificacao;
+
+        let totalVales = 0;
+        let valesPeriodo = [];
+        if (dataInicioVal && dataFimVal) {
+            // Use date boundaries ignoring timezone offset shift issues
+            const dInicio = new Date(dataInicioVal + 'T00:00:00');
+            const dFim = new Date(dataFimVal + 'T23:59:59');
+            
+            valesPeriodo = adiantamentos.filter(adv => {
+                const dAdv = new Date(adv.data + 'T12:00:00');
+                // Backend discount rule: all pending vales <= dFim
+                return dAdv <= dFim;
+            });
+            
+            totalVales = valesPeriodo.reduce((acc, curr) => acc + curr.valor, 0);
+        }
+
+        let liquido = ganhos - desconto - totalVales;
+
+        // ATUALIZAÇÃO DO SIMULADOR DE HOLERITE
+        simNome.textContent = funcionarioNome;
+        simTipo.textContent = tipoPagamento ? (tipoPagamento === 'DIARISTA' ? 'Diarista' : 'Mensalista') : '---';
+        
+        if (dataInicioVal && dataFimVal) {
+            simPeriodo.textContent = `${formatDateBr(dataInicioVal)} até ${formatDateBr(dataFimVal)} (${diasTotaisPeriodo}d)`;
+        } else {
+            simPeriodo.textContent = '---';
+        }
+
+        if (tipoPagamento === 'DIARISTA') {
+            simDescGanho.textContent = 'Diárias Calculadas';
+            simRefGanho.textContent = `${diasTrab}d (R$ ${valorDiaria.toFixed(2)})`;
+            simValGanho.textContent = formatCurrency(ganhos);
+            document.getElementById('row-desconto-falta').style.display = 'none';
+        } else if (tipoPagamento === 'MENSALISTA') {
+            simDescGanho.textContent = 'Salário Base';
+            simRefGanho.textContent = '30d';
+            simValGanho.textContent = formatCurrency(salarioMensal);
+            document.getElementById('row-desconto-falta').style.display = 'table-row';
+            simRefFalta.textContent = `${diasFalt}d`;
+            simValFalta.textContent = formatCurrency(desconto);
+        } else {
+            simDescGanho.textContent = '---';
+            simRefGanho.textContent = '---';
+            simValGanho.textContent = 'R$ 0,00';
+            document.getElementById('row-desconto-falta').style.display = 'none';
+        }
+
+        const rowGanhoExtra = document.getElementById('row-ganho-extra');
+        let totalExtra = valHorasExtras + valBonificacao;
+        if (totalExtra > 0) {
+            rowGanhoExtra.style.display = 'table-row';
+            document.getElementById('sim-val-extra').textContent = formatCurrency(totalExtra);
+        } else {
+            rowGanhoExtra.style.display = 'none';
+        }
+
+        const rowAdiantamento = document.getElementById('row-desconto-adiantamento');
+        if (totalVales > 0) {
+            rowAdiantamento.style.display = 'table-row';
+            document.getElementById('sim-ref-adiantamento').textContent = `${valesPeriodo.length} vale(s)`;
+            document.getElementById('sim-val-adiantamento').textContent = formatCurrency(totalVales);
+        } else {
+            rowAdiantamento.style.display = 'none';
+        }
+
+        simTotalBruto.textContent = formatCurrency(ganhos);
+        simTotalDesconto.textContent = formatCurrency(desconto + totalVales);
+        simTotalLiquido.textContent = formatCurrency(liquido);
+
+        // ATUALIZAÇÃO DAS ABAS DE DETALHES DO PERÍODO
+        const valesUl = document.getElementById('closure-vales-ul');
+        const valesEmpty = document.getElementById('closure-vales-empty');
+        const regsUl = document.getElementById('closure-registros-ul');
+        const regsEmpty = document.getElementById('closure-registros-empty');
+
+        if (valesUl && valesEmpty) {
+            valesUl.innerHTML = '';
+            if (valesPeriodo.length > 0) {
+                valesEmpty.style.display = 'none';
+                valesPeriodo.forEach(v => {
+                    const li = document.createElement('li');
+                    li.style.padding = '8px 0';
+                    li.style.borderBottom = '1px dashed rgba(255,255,255,0.05)';
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.innerHTML = `<span><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">calendar_month</span> <strong>${formatDateBr(v.data)}</strong> - R$ ${v.valor.toFixed(2)}</span>
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">${v.observacao || 'sem obs'}</span>`;
+                    valesUl.appendChild(li);
+                });
+            } else {
+                valesEmpty.style.display = 'block';
+                valesEmpty.textContent = dataInicioVal && dataFimVal ? 'Nenhum vale lançado neste período.' : 'Selecione um funcionário e datas válidas.';
+            }
+        }
+
+        if (regsUl && regsEmpty) {
+            regsUl.innerHTML = '';
+            let funcId = isGlobal ? (selectFuncionario ? selectFuncionario.value : null) : "{{ funcionario.id }}";
+            let periodRegs = [];
+            if (funcId && funcionariosDados[funcId] && funcionariosDados[funcId].registros && dataInicioVal && dataFimVal) {
+                const regs = funcionariosDados[funcId].registros;
+                const dInicio = new Date(dataInicioVal + 'T00:00:00');
+                const dFim = new Date(dataFimVal + 'T23:59:59');
+                periodRegs = regs.filter(r => {
+                    const dReg = new Date(r.data + 'T12:00:00');
+                    return dReg >= dInicio && dReg <= dFim;
+                });
+            }
+
+            if (periodRegs.length > 0) {
+                regsEmpty.style.display = 'none';
+                // Ordenar por data
+                periodRegs.sort((a, b) => new Date(a.data) - new Date(b.data));
+                periodRegs.forEach(r => {
+                    const li = document.createElement('li');
+                    li.style.padding = '6px 0';
+                    li.style.borderBottom = '1px dashed rgba(255,255,255,0.05)';
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    const tipoTexto = r.tipo === 'PRESENCA' ? '<span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">check_circle</span> Presença' : '<span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">cancel</span> Falta';
+                    const tipoCor = r.tipo === 'PRESENCA' ? 'var(--primary-color)' : 'var(--error-color)';
+                    li.innerHTML = `<span><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">calendar_month</span> <strong>${formatDateBr(r.data)}</strong></span>
+                                    <span style="color: ${tipoCor}; font-weight: bold; display: flex; align-items: center; gap: 4px;">${tipoTexto}</span>`;
+                    regsUl.appendChild(li);
+                });
+            } else {
+                regsEmpty.style.display = 'block';
+                regsEmpty.textContent = dataInicioVal && dataFimVal ? 'Nenhuma folha diária registrada neste período.' : 'Selecione um funcionário e datas válidas.';
+            }
+        }
+    }
+
+    window.switchClosureTab = function(evt, tabId) {
+        // Ocultar todos os conteúdos
+        const contents = document.querySelectorAll('.closure-tab-content');
+        contents.forEach(c => c.style.display = 'none');
+        
+        // Remover a classe active de todos os botões
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(b => {
+            b.classList.remove('active');
+            b.style.borderBottom = 'none';
+            b.style.color = 'var(--text-muted)';
+            b.style.fontWeight = 'normal';
+        });
+        
+        // Mostrar o conteúdo ativo
+        document.getElementById(tabId).style.display = 'block';
+        
+        // Ativar o botão clicado
+        evt.currentTarget.classList.add('active');
+        evt.currentTarget.style.borderBottom = '2px solid var(--primary-color)';
+        evt.currentTarget.style.color = 'var(--text-color)';
+        evt.currentTarget.style.fontWeight = 'bold';
+    }
+    
+    inputDataInicio.addEventListener('change', updateCalculations);
+    inputDataFim.addEventListener('change', updateCalculations);
+    inputDiasTrab.addEventListener('input', updateCalculations);
+    inputFaltas.addEventListener('input', updateCalculations);
+    if (selectFuncionario) {
+        selectFuncionario.addEventListener('change', updateCalculations);
+    }
+    
+    if (inputHorasExtras) inputHorasExtras.addEventListener('input', updateCalculations);
+    if (inputBonificacao) inputBonificacao.addEventListener('input', updateCalculations);
+    
+    updateCalculations();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,285 @@
+:root {
+    --bg-color: #0d1117;          /* Preto elegante/comercial (Estilo SaaS Premium) */
+    --card-bg: #161b22;           /* Fundo dos cards refinado */
+    --text-color: #f0f6fc;        /* Branco suave para textos principais */
+    --primary-color: #d4f434;     /* Amarelo/Verde neon da identidade */
+    --primary-hover: #e5f96b;     /* Hover do botão principal */
+    --secondary-color: #21262d;   /* Cinza comercial para botões secundários */
+    --border-color: rgba(240, 246, 252, 0.08); /* Bordas ultra sutis premium */
+    --input-bg: #0d1117;          /* Fundo dos inputs contrastante */
+    --text-muted: #8b949e;        /* Cinza sofisticado para textos secundários */
+    --error-color: #f85149;       /* Vermelho suave para alertas */
+    --sidebar-width: 260px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #000000; /* Texto bem escuro para alto contraste */
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.375rem; /* Borda mais comercial */
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover);
+    color: #171d18;
+}
+
+/* Layout do Dashboard */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (Menu Lateral) */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.sidebar-header p {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+}
+
+.sidebar-nav {
+    padding: 1.5rem 0;
+    flex-grow: 1;
+}
+
+.nav-link {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-footer .nav-link {
+    padding: 0.5rem 0;
+    color: #fca5a5; /* Vermelho claro para sair */
+}
+
+.sidebar-footer .nav-link:hover {
+    color: white;
+    background-color: transparent;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color);
+}
+
+.topbar {
+    background-color: transparent;
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.user-info {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.content-area {
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+/* Dashboard Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Reduzido para permitir cards menores */
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    padding: 1.25rem; /* Padding reduzido para card menor */
+    border-radius: 0.5rem; /* Bordas um pouco menos arredondadas proporcionalmente */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Sombra mais contida */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 244, 52, 0.3); /* Brilho amarelo/verde no hover */
+}
+
+.card h3 {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.card .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+/* Novo layout para métricas extras dentro do card */
+.card .extra-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.card .extra-info span {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* Responsividade (Mobile) */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1rem;
+    }
+    
+    .sidebar-header {
+        padding: 1rem 0;
+        border-bottom: none;
+        text-align: left;
+    }
+    
+    .sidebar-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .sidebar-header p {
+        display: none; /* Oculta o slogan na barra superior mobile para ganhar espaço */
+    }
+    
+    .sidebar-nav {
+        display: flex;
+        padding: 0;
+    }
+    
+    .nav-link {
+        padding: 1rem 0.75rem;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        font-size: 0.85rem;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+        border-left-color: transparent;
+        border-bottom-color: white;
+    }
+    
+    .sidebar-footer {
+        padding: 0;
+        border-top: none;
+    }
+    
+    .sidebar-footer .nav-link {
+        padding: 1rem 0.5rem;
+    }
+
+    .topbar {
+        padding: 1rem;
+    }
+
+    .topbar h1 {
+        font-size: 1.25rem;
+    }
+
+    .content-area {
+        padding: 1rem;
+    }
+}

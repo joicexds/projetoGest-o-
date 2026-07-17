@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Gastos - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>Controle de Despesas</h1>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-color);">Lançamentos</h2>
+                <a href="{% url 'gasto_create' %}" class="btn" style="width: auto;">+ Novo Gasto</a>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Data</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Descrição / Categoria</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Valor</th>
+                            <th style="padding: 1rem 1.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for gasto in gastos %}
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                            <td style="padding: 1rem 1.5rem;">{{ gasto.data_gasto|date:"d/m/Y" }}</td>
+                            <td style="padding: 1rem 1.5rem;">
+                                <div style="font-weight: 600;">{{ gasto.descricao }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                    {{ gasto.categoria.nome }}
+                                    {% if gasto.funcionario_vinculado %}
+                                    - <span style="color: var(--primary-color);">{{ gasto.funcionario_vinculado.nome }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="padding: 1rem 1.5rem; font-weight: 700; color: #ff6b6b;">
+                                R$ {{ gasto.valor|floatformat:2 }}
+                            </td>
+                            <td style="padding: 1rem 1.5rem;">
+                                <a href="{% url 'gasto_update' gasto.id %}" style="color: var(--primary-color); margin-right: 1rem; font-size: 0.85rem;">Editar</a>
+                                <a href="{% url 'gasto_delete' gasto.id %}" style="color: var(--error-color); font-size: 0.85rem;">Excluir</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                Nenhum gasto registrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Ações de RH - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Ações de RH</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                {% include 'includes/topbar_user.html' %}
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- Navegação de Abas -->
+            <div class="tabs-container">
+                <button class="tab-btn {% if active_tab == 'fechamentos' %}active{% endif %}" data-tab="fechamentos" onclick="switchTab('fechamentos')">
+                    <span class="material-symbols-outlined">assignment</span> Fechamentos (Apontamentos)
+                </button>
+                <button class="tab-btn {% if active_tab == 'atestados' %}active{% endif %}" data-tab="atestados" onclick="switchTab('atestados')">
+                    <span class="material-symbols-outlined">medical_services</span> Atestados Médicos
+                </button>
+            </div>
+
+            <!-- Conteúdo da Aba: Fechamentos -->
+            <div id="fechamentos" class="tab-content {% if active_tab == 'fechamentos' %}active{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 600;">Todos os Fechamentos de Período</h2>
+                    <a href="{% url 'apontamento_create_global' %}" class="btn btn-primary" style="width: auto; background-color: var(--primary-color); color: var(--bg-color);">+ Novo Fechamento</a>
+                </div>
+                
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background-color: rgba(255,255,255,0.05);">
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Funcionário</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Dias Trab / Falta</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ganhos</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ap in apontamentos %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem; font-weight: bold; color: var(--primary-color);">
+                                    <a href="{% url 'funcionario_detail' ap.funcionario.id %}" style="text-decoration: none; color: inherit;">
+                                        {{ ap.funcionario.nome }}
+                                    </a>
+                                </td>
+                                <td style="padding: 1rem; font-weight: 600;">{{ ap.data_inicio|date:"d/m/Y" }} a {{ ap.data_fim|date:"d/m/Y" }}</td>
+                                <td style="padding: 1rem;">
+                                    Trab: {{ ap.dias_trabalhados }} | Faltas: <span style="color: var(--error-color);">{{ ap.dias_falta }}</span>
+                                </td>
+                                <td style="padding: 1rem;">R$ {{ ap.calculo_ganhos|floatformat:2 }}</td>
+                                <td style="padding: 1rem;">
+                                    <form method="post" action="{% url 'apontamento_delete' ap.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum apontamento/fechamento encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteúdo da Aba: Atestados -->
+            <div id="atestados" class="tab-content {% if active_tab == 'atestados' %}active{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 600;">Todos os Atestados Registrados</h2>
+                    <a href="{% url 'atestado_create_global' %}" class="btn btn-primary" style="width: auto; background-color: var(--primary-color); color: var(--bg-color);">+ Novo Atestado</a>
+                </div>
+
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background-color: rgba(255,255,255,0.05);">
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Funcionário</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Período</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Observação / CID</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Anexo</th>
+                                <th style="padding: 1rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for at in atestados %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem; font-weight: bold; color: var(--primary-color);">
+                                    <a href="{% url 'funcionario_detail' at.funcionario.id %}" style="text-decoration: none; color: inherit;">
+                                        {{ at.funcionario.nome }}
+                                    </a>
+                                </td>
+                                <td style="padding: 1rem; font-weight: 600;">{{ at.data_inicio|date:"d/m/Y" }} a {{ at.data_fim|date:"d/m/Y" }}</td>
+                                <td style="padding: 1rem;">{{ at.observacao|default:"-" }}</td>
+                                <td style="padding: 1rem;">
+                                    {% if at.foto %}
+                                    <a href="{{ at.foto.url }}" target="_blank" style="color: var(--primary-color);">Ver Foto</a>
+                                    {% else %}
+                                    Sem anexo
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <form method="post" action="{% url 'atestado_delete' at.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none; border:none; color:var(--error-color); cursor:pointer; font-size:0.8rem;">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum atestado encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<style>
+    .tabs-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .tab-btn:hover {
+        color: var(--text-color);
+    }
+    .tab-btn.active {
+        color: var(--primary-color);
+    }
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -9px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: var(--primary-color);
+        border-radius: 3px 3px 0 0;
+    }
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabName).classList.add('active');
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabName);
+        window.history.replaceState({}, '', url);
+    }
+</script>
+{% endblock %}

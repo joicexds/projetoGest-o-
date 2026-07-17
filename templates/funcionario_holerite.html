@@ -6,98 +6,17 @@
     <title>Holerite - {{ funcionario.nome }}</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #000000;
-            line-height: 1.4;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #000;
+            line-height: 1.2;
             margin: 0;
             padding: 2rem;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            padding: 2rem;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .header p {
-            margin: 0.2rem 0 0 0;
-            font-size: 0.9rem;
-            color: #555;
-        }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-        .info-section div {
-            flex: 1;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.5rem;
-            text-align: left;
-        }
-        th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .totals {
-            margin-top: 1.5rem;
-            border-top: 2px solid #000;
-            padding-top: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            font-size: 1.1rem;
-        }
-        .totals .line {
-            display: flex;
-            justify-content: space-between;
-            width: 300px;
-            margin-bottom: 0.5rem;
-        }
-        .totals .net {
-            font-weight: bold;
-            font-size: 1.3rem;
-            border-top: 1px dashed #000;
-            padding-top: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .signature {
-            margin-top: 5rem;
-            text-align: center;
-        }
-        .signature-line {
-            border-top: 1px solid #000;
-            width: 300px;
-            margin: 0 auto;
-            padding-top: 0.5rem;
-            font-size: 0.9rem;
         }
         .print-btn {
             display: block;
-            width: 200px;
-            margin: 2rem auto;
+            width: 250px;
+            margin: 0 auto 2rem auto;
             padding: 0.75rem;
             text-align: center;
             background-color: #121212;
@@ -108,110 +27,335 @@
             cursor: pointer;
             border: none;
         }
+        .holerite-container {
+            background-color: #fff;
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            border: 2px solid #000;
+            padding: 0;
+            page-break-after: always;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .holerite-container:last-child {
+            page-break-after: auto;
+        }
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 2px solid #000;
+        }
+        .top-header .empresa-info {
+            font-size: 0.85rem;
+        }
+        .top-header .recibo-info {
+            text-align: right;
+        }
+        .top-header h1 {
+            font-size: 1.3rem;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+        }
+        .func-header {
+            display: flex;
+            border-bottom: 2px solid #000;
+            font-size: 0.85rem;
+            background-color: #f9f9f9;
+        }
+        .func-header .col {
+            padding: 5px 10px;
+            border-right: 1px solid #000;
+        }
+        .func-header .col:last-child {
+            border-right: none;
+        }
+        .func-header .title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .func-header .val {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .main-table th {
+            border-bottom: 2px solid #000;
+            border-right: 1px solid #000;
+            padding: 8px 5px;
+            text-align: center;
+            font-weight: normal;
+        }
+        .main-table th:last-child {
+            border-right: none;
+        }
+        .main-table td {
+            border-right: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+        }
+        .main-table td:last-child {
+            border-right: none;
+        }
+        .main-table .col-cod { width: 50px; text-align: center; }
+        .main-table .col-desc { text-align: left; }
+        .main-table .col-ref { width: 80px; text-align: center; }
+        .main-table .col-prov { width: 100px; text-align: right; }
+        .main-table .col-desc-val { width: 100px; text-align: right; }
+
+        .items-body {
+            height: 250px; /* Force minimum height like a real holerite */
+        }
+        
+        .totals-row {
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+        }
+        .totals-row td {
+            padding: 10px 5px;
+        }
+        .totals-summary {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .footer-bases {
+            display: flex;
+            font-size: 0.75rem;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .footer-bases .col {
+            flex: 1;
+            border-right: 1px solid #000;
+            padding: 5px;
+        }
+        .footer-bases .col:last-child {
+            border-right: none;
+        }
+        .footer-bases .title {
+            display: block;
+            margin-bottom: 3px;
+        }
+        .footer-bases .val {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .signatures {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        .signatures .msg {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+        .signatures .line {
+            width: 300px;
+            border-top: 1px solid #000;
+            margin: 0 auto;
+            padding-top: 5px;
+        }
+
         @media print {
+            body { background-color: #fff; padding: 0; }
             .print-btn { display: none; }
-            body { padding: 0; }
-            .container { border: none; padding: 0; }
+            .holerite-container { border: 2px solid #000; margin: 0; box-shadow: none; width: 100%; }
         }
     </style>
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">🖨️ Imprimir Holerite</button>
-    
-    <div class="container">
-        <div class="header">
-            <h1>FLORASYLVER</h1>
-            <p>Recibo de Pagamento - Controle Interno</p>
-        </div>
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir Holerites</button>
 
-        <div class="info-section">
-            <div>
-                <strong>Funcionário:</strong> {{ funcionario.nome }}<br>
-                <strong>CPF:</strong> {{ funcionario.cpf }}<br>
-                <strong>Cargo:</strong> {{ funcionario.cargo }}
+    {% for ap in apontamentos %}
+    <div class="holerite-container">
+        <!-- TOP HEADER -->
+        <div class="top-header">
+            <div class="empresa-info">
+                <strong>EMPREGADOR</strong><br>
+                Nome: FLORASYLVER<br>
+                Endereço: Controle Interno<br>
+                CNPJ: --
             </div>
-            <div style="text-align: right;">
-                <strong>Data de Emissão:</strong> {% now "d/m/Y" %}<br>
-                <strong>Tipo de Contrato:</strong> {{ funcionario.get_tipo_pagamento_display }}<br>
+            <div class="recibo-info">
+                <h1>Recibo de Pagamento de Salário</h1>
+                Referente ao Período: <strong>{{ ap.data_inicio|date:"d/m/Y" }} a {{ ap.data_fim|date:"d/m/Y" }}</strong>
             </div>
         </div>
 
-        <h3>1. Ganhos Mensais / Diárias</h3>
-        <table>
+        <!-- FUNCIONARIO HEADER -->
+        <div class="func-header">
+            <div class="col" style="width: 50px;">
+                <span class="title">Código</span>
+                <span class="val">{{ funcionario.id|stringformat:"04d" }}</span>
+            </div>
+            <div class="col" style="flex: 1;">
+                <span class="title">Nome do Funcionário</span>
+                <span class="val">{{ funcionario.nome }}</span>
+            </div>
+            <div class="col" style="width: 80px;">
+                <span class="title">CBO</span>
+                <span class="val">-</span>
+            </div>
+            <div class="col" style="width: 200px;">
+                <span class="title">Função</span>
+                <span class="val">{{ funcionario.cargo }}</span>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <table class="main-table">
             <thead>
                 <tr>
-                    <th>Descrição</th>
-                    <th style="width: 150px; text-align: right;">Valor (R$)</th>
+                    <th class="col-cod">Cód.</th>
+                    <th class="col-desc">Descrição</th>
+                    <th class="col-ref">Referência</th>
+                    <th class="col-prov">Proventos</th>
+                    <th class="col-desc-val">Descontos</th>
                 </tr>
             </thead>
-            <tbody>
-                {% if funcionario.tipo_pagamento == 'DIARISTA' %}
-                    {% for reg in registros %}
-                        {% if reg.tipo == 'PRESENCA' %}
-                        <tr>
-                            <td>Diária Trabalhada - {{ reg.data|date:"d/m/Y" }}</td>
-                            <td style="text-align: right;">{{ reg.valor_diaria_aplicada|floatformat:2 }}</td>
-                        </tr>
+            <tbody class="items-body">
+                <!-- Salário Base -->
+                <tr>
+                    <td class="col-cod">001</td>
+                    <td class="col-desc">SALÁRIO BASE / DIÁRIAS</td>
+                    <td class="col-ref">{% if funcionario.tipo_pagamento == 'MENSALISTA' %}30 dias{% else %}{{ ap.dias_trabalhados }} dias{% endif %}</td>
+                    <td class="col-prov">
+                        {% if funcionario.tipo_pagamento == 'DIARISTA' %}
+                            {% widthratio ap.dias_trabalhados 1 funcionario.valor_diaria as calc_sal %}{{ calc_sal|floatformat:2 }}
+                        {% else %}
+                            {{ funcionario.salario|floatformat:2 }}
                         {% endif %}
-                    {% empty %}
-                        <tr>
-                            <td colspan="2" style="text-align: center; color: #555;">Nenhuma diária registrada no período.</td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td>Salário Mensal Base</td>
-                        <td style="text-align: right;">{{ funcionario.salario|floatformat:2 }}</td>
-                    </tr>
+                    </td>
+                    <td class="col-desc-val"></td>
+                </tr>
+
+                <!-- Horas Extras -->
+                {% if ap.valor_horas_extras > 0 %}
+                <tr>
+                    <td class="col-cod">002</td>
+                    <td class="col-desc">HORAS EXTRAORDINÁRIAS</td>
+                    <td class="col-ref">-</td>
+                    <td class="col-prov">{{ ap.valor_horas_extras|floatformat:2 }}</td>
+                    <td class="col-desc-val"></td>
+                </tr>
                 {% endif %}
+
+                <!-- Bonificação -->
+                {% if ap.bonificacao > 0 %}
+                <tr>
+                    <td class="col-cod">003</td>
+                    <td class="col-desc">BONIFICAÇÃO / PREMIAÇÃO</td>
+                    <td class="col-ref">-</td>
+                    <td class="col-prov">{{ ap.bonificacao|floatformat:2 }}</td>
+                    <td class="col-desc-val"></td>
+                </tr>
+                {% endif %}
+
+                <!-- Faltas -->
+                {% if ap.dias_falta > 0 %}
+                <tr>
+                    <td class="col-cod">101</td>
+                    <td class="col-desc">FALTAS / ATRASOS</td>
+                    <td class="col-ref">{{ ap.dias_falta }} dias</td>
+                    <td class="col-prov"></td>
+                    <td class="col-desc-val">{{ ap.calculo_desconto_faltas|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+
+                <!-- Vales / Adiantamentos -->
+                {% if ap.calculo_adiantamentos > 0 %}
+                <tr>
+                    <td class="col-cod">102</td>
+                    <td class="col-desc">VALES / ADIANTAMENTOS</td>
+                    <td class="col-ref">-</td>
+                    <td class="col-prov"></td>
+                    <td class="col-desc-val">{{ ap.calculo_adiantamentos|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                
+                <!-- Blank rows to fill space -->
+                <tr><td class="col-cod"></td><td class="col-desc"></td><td class="col-ref"></td><td class="col-prov"></td><td class="col-desc-val"></td></tr>
+                <tr><td class="col-cod"></td><td class="col-desc"></td><td class="col-ref"></td><td class="col-prov"></td><td class="col-desc-val"></td></tr>
+                <tr><td class="col-cod"></td><td class="col-desc"></td><td class="col-ref"></td><td class="col-prov"></td><td class="col-desc-val"></td></tr>
             </tbody>
+            <tfoot>
+                <tr class="totals-row">
+                    <td colspan="3" style="text-align: right; border-right: 1px solid #000; padding: 5px;">
+                        <span style="font-size: 0.7rem;">Total dos Vencimentos</span><br>
+                        <strong>{{ ap.calculo_ganhos|floatformat:2 }}</strong>
+                    </td>
+                    <td colspan="2" style="text-align: right; padding: 5px;">
+                        <span style="font-size: 0.7rem;">Total dos Descontos</span><br>
+                        <strong>{{ ap.calculo_total_descontos|floatformat:2 }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="border-right: 1px solid #000;"></td>
+                    <td colspan="2" style="text-align: right; padding: 5px; background-color: #f9f9f9;">
+                        <span style="font-size: 0.8rem; font-weight: bold; margin-right: 10px;">Líquido a Receber -></span>
+                        <strong style="font-size: 1.1rem;">{{ ap.calculo_liquido|floatformat:2 }}</strong>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
 
-        <h3>2. Descontos / Adiantamentos (Vales)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Descrição do Vale</th>
-                    <th style="width: 150px; text-align: right;">Valor (R$)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ad in adiantamentos %}
-                <tr>
-                    <td>{{ ad.data|date:"d/m/Y" }}</td>
-                    <td>{{ ad.observacao|default:"Adiantamento / Vale" }}</td>
-                    <td style="text-align: right;">{{ ad.valor|floatformat:2 }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" style="text-align: center; color: #555;">Nenhum vale pendente.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="totals">
-            <div class="line">
-                <span>Total de Ganhos:</span>
-                <span>R$ {{ total_ganhos|floatformat:2 }}</span>
+        <!-- FOOTER BASES -->
+        <div class="footer-bases">
+            <div class="col">
+                <span class="title">Salário Base</span>
+                <span class="val">{% if funcionario.tipo_pagamento == 'MENSALISTA' %}{{ funcionario.salario|floatformat:2 }}{% else %}-{% endif %}</span>
             </div>
-            <div class="line" style="color: #d32f2f;">
-                <span>Total de Descontos:</span>
-                <span>- R$ {{ total_adiantado_pendente|floatformat:2 }}</span>
+            <div class="col">
+                <span class="title">Base Cálc. INSS</span>
+                <span class="val">0,00</span>
             </div>
-            <div class="line net">
-                <span>LÍQUIDO A RECEBER:</span>
-                <span>R$ {{ salario_liquido|floatformat:2 }}</span>
+            <div class="col">
+                <span class="title">Base Cálc. FGTS</span>
+                <span class="val">0,00</span>
+            </div>
+            <div class="col">
+                <span class="title">FGTS do Mês</span>
+                <span class="val">0,00</span>
+            </div>
+            <div class="col">
+                <span class="title">Base Cálc. IRRF</span>
+                <span class="val">0,00</span>
+            </div>
+            <div class="col">
+                <span class="title">Faixa IRRF</span>
+                <span class="val">0</span>
             </div>
         </div>
 
-        <div class="signature">
-            <div class="signature-line">
-                <strong>{{ funcionario.nome }}</strong><br>
-                Assinatura do Recebedor
+        <!-- SIGNATURES -->
+        <div class="signatures">
+            <div class="msg">Recebi a importância líquida discriminada neste recibo.</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    Data: ___/___/_______
+                </div>
+                <div>
+                    <div class="line"></div>
+                    <strong>{{ funcionario.nome }}</strong>
+                </div>
             </div>
         </div>
     </div>
+    {% empty %}
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>Nenhum fechamento registrado para este funcionário.</h2>
+        <p>Vá até as Ações de RH e realize o Apontamento / Fechamento de dias primeiro.</p>
+    </div>
+    {% endfor %}
 </body>
 </html>

@@ -67,6 +67,17 @@ class RegistroTrabalho(models.Model):
         return f"{self.funcionario.nome} - {self.data} - {self.tipo}"
 
 
+class FazendaCliente(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Nome da Fazenda / Cliente")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+    class Meta:
+        unique_together = ['usuario', 'nome']
+
+    def __str__(self):
+        return self.nome
+
+
 class CategoriaGasto(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome da Categoria")
     descricao = models.TextField(blank=True, null=True, verbose_name="Descrição (Opcional)")
@@ -93,6 +104,7 @@ class Gasto(models.Model):
         verbose_name="Funcionário Referente (Opcional)",
         help_text="Preencha apenas se for um gasto direcionado a um funcionário específico (ex: EPI, Adiantamento)."
     )
+    fazenda_cliente = models.ForeignKey(FazendaCliente, on_delete=models.SET_NULL, null=True, blank=True, related_name="gastos", verbose_name="Fazenda / Cliente")
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
@@ -112,6 +124,7 @@ class Adiantamento(models.Model):
     valor = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor do Adiantamento (R$)")
     data = models.DateField(verbose_name="Data do Adiantamento")
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PENDENTE', verbose_name="Status")
+    apontamento_vinculado = models.ForeignKey('Apontamento', on_delete=models.SET_NULL, null=True, blank=True, related_name='vales_descontados')
     observacao = models.TextField(blank=True, null=True, verbose_name="Observação")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
@@ -123,12 +136,80 @@ class Receita(models.Model):
     descricao = models.CharField(max_length=255, verbose_name="Descrição da Receita")
     valor = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor Recebido (R$)")
     data_recebimento = models.DateField(verbose_name="Data do Recebimento")
+    fazenda_cliente = models.ForeignKey(FazendaCliente, on_delete=models.SET_NULL, null=True, blank=True, related_name="receitas", verbose_name="Fazenda / Cliente")
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     data_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.descricao} - R$ {self.valor}"
+
+
+class Atestado(models.Model):
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE, related_name="atestados_medicos", verbose_name="Funcionário")
+    data_inicio = models.DateField(verbose_name="Data de Início")
+    data_fim = models.DateField(verbose_name="Data de Retorno")
+    foto = models.ImageField(upload_to="atestados/", blank=True, null=True, verbose_name="Foto do Atestado")
+    observacao = models.TextField(blank=True, null=True, verbose_name="Observações / CID")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    data_registro = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Atestado: {self.funcionario.nome} ({self.data_inicio} a {self.data_fim})"
+
+class Apontamento(models.Model):
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE, related_name="apontamentos", verbose_name="Funcionário")
+    data_inicio = models.DateField(verbose_name="Data de Início do Período")
+    data_fim = models.DateField(verbose_name="Data de Fim do Período")
+    dias_trabalhados = models.PositiveIntegerField(default=0, verbose_name="Dias Trabalhados (Diaristas)")
+    dias_falta = models.PositiveIntegerField(default=0, verbose_name="Dias de Falta (Mensalistas)")
+    valor_horas_extras = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="Horas Extras (R$)")
+    bonificacao = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="Bonificação (R$)")
+    observacao = models.TextField(blank=True, null=True, verbose_name="Observações")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    data_registro = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Apontamento: {self.funcionario.nome} ({self.data_inicio} a {self.data_fim})"
+
+    @property
+    def calculo_ganhos(self):
+        base = 0.0
+        if self.funcionario.tipo_pagamento == 'DIARISTA':
+            base = float(self.dias_trabalhados) * float(self.funcionario.valor_diaria or 0)
+        else:
+            base = float(self.funcionario.salario)
+        return base + float(self.valor_horas_extras) + float(self.bonificacao)
+            
+    @property
+    def calculo_desconto_faltas(self):
+        if self.funcionario.tipo_pagamento == 'MENSALISTA':
+            valor_dia = float(self.funcionario.salario) / 30.0
+            return float(self.dias_falta) * valor_dia
+        return 0.0
+
+    @property
+    def calculo_adiantamentos(self):
+        # Novo formato: Vales explicitamente vinculados a este apontamento
+        vales_fk = self.vales_descontados.aggregate(total=models.Sum('valor'))['total'] or 0.0
+        
+        # Legado: Vales antigos que dependem apenas do range de datas
+        vales_legacy = self.funcionario.adiantamentos.filter(
+            data__gte=self.data_inicio,
+            data__lte=self.data_fim,
+            status='DESCONTADO',
+            apontamento_vinculado__isnull=True
+        ).aggregate(total=models.Sum('valor'))['total'] or 0.0
+        
+        return float(vales_fk) + float(vales_legacy)
+
+    @property
+    def calculo_liquido(self):
+        return self.calculo_ganhos - self.calculo_desconto_faltas - self.calculo_adiantamentos
+
+    @property
+    def calculo_total_descontos(self):
+        return self.calculo_desconto_faltas + self.calculo_adiantamentos
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if fazenda %}Editar Fazenda / Cliente{% else %}Nova Fazenda / Cliente{% endif %} - FLORASYLVER{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1>{% if fazenda %}Editar: {{ fazenda.nome }}{% else %}Cadastrar Nova Fazenda / Cliente{% endif %}</h1>
+            {% include 'includes/topbar_user.html' %}
+        </header>
+
+        <section class="content-area">
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div style="color: var(--error-color); margin-bottom: 1rem;">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label for="{{ field.id_for_label }}" style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">{{ field.help_text }}</span>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <span style="color: var(--error-color); font-size: 0.8rem;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="submit" class="btn" style="flex: 1;">Salvar</button>
+                        <a href="{% url 'fazenda_list' %}" class="btn" style="flex: 1; text-align: center; background-color: var(--border-color); color: var(--text-color); text-decoration: none;">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type !== 'hidden' && el.type !== 'submit') {
+            el.style.padding = '0.75rem';
+            el.style.borderRadius = '8px';
+            el.style.border = '1px solid var(--border-color)';
+            el.style.backgroundColor = 'var(--input-bg)';
+            el.style.color = 'var(--text-color)';
+            el.style.width = '100%';
+        }
+    });
+</script>
+{% endblock %}
